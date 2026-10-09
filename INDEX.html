@@ -1,0 +1,2599 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pokémon Pixel Adventure - Legendární Edice Pro Syna</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            margin: 0;
+            padding: 0;
+            font-family: 'Press Start 2P', monospace;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050811;
+            image-rendering: pixelated;
+        }
+        .pixel-art {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        .retro-border {
+            border: 3px solid #374151;
+            box-shadow: inset -3px -3px 0px 0px #111827, inset 3px 3px 0px 0px #9ca3af;
+        }
+        .retro-gold-box {
+            border: 3px solid #b45309;
+            box-shadow: inset -3px -3px 0px 0px #78350f, inset 3px 3px 0px 0px #fde047;
+        }
+        .retro-purple-box {
+            border: 3px solid #6b21a8;
+            box-shadow: inset -3px -3px 0px 0px #3b0764, inset 3px 3px 0px 0px #c084fc;
+        }
+        @keyframes pokeShake {
+            0%, 100% { transform: rotate(0deg); }
+            20% { transform: rotate(-28deg); }
+            40% { transform: rotate(28deg); }
+            60% { transform: rotate(-18deg); }
+            80% { transform: rotate(18deg); }
+        }
+        .animate-shake {
+            animation: pokeShake 0.75s ease-in-out infinite;
+        }
+        @keyframes victoryPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px #facc15); }
+            50% { transform: scale(1.12); filter: drop-shadow(0 0 25px #ec4899); }
+        }
+        .animate-victory {
+            animation: victoryPulse 1.2s ease-in-out infinite;
+        }
+        @keyframes eggWobble {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-12deg); }
+            75% { transform: scale(1.1) rotate(12deg); }
+        }
+        .animate-egg {
+            animation: eggWobble 0.5s ease-in-out infinite;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-gray-950 text-white flex h-screen w-screen overflow-hidden">
+
+    <!-- LEVÝ NAVIGAČNÍ PANEL -->
+    <aside id="sidebar-nav" class="hidden sm:flex flex-col justify-between w-20 md:w-44 bg-gray-900/95 border-r-4 border-gray-800 z-30 p-2 sm:p-3 shrink-0">
+        <div class="flex flex-col space-y-3">
+            <div class="flex flex-col items-center justify-center p-2 bg-gradient-to-b from-blue-900 to-indigo-950 rounded-xl retro-border text-center">
+                <span class="text-xl md:text-2xl">⚡</span>
+                <span class="text-[7px] md:text-[8px] text-yellow-300 font-extrabold mt-1 tracking-wider hidden md:inline">POKÉ-SVĚT</span>
+            </div>
+
+            <button id="nav-btn-shop" class="flex items-center space-x-2 p-2 rounded-xl bg-gray-800 hover:bg-amber-600 transition retro-border text-[8px] md:text-[9px] active:scale-95 cursor-pointer" title="Obchod">
+                <span class="text-base md:text-lg">🛒</span>
+                <span class="hidden md:inline">OBCHOD</span>
+            </button>
+            <button id="nav-btn-map" class="flex items-center space-x-2 p-2 rounded-xl bg-gray-800 hover:bg-emerald-600 transition retro-border text-[8px] md:text-[9px] active:scale-95 cursor-pointer" title="Mapa Zón">
+                <span class="text-base md:text-lg">🗺️</span>
+                <span class="hidden md:inline">MAPA</span>
+            </button>
+            <button id="nav-btn-team" class="flex items-center space-x-2 p-2 rounded-xl bg-gray-800 hover:bg-blue-600 transition retro-border text-[8px] md:text-[9px] active:scale-95 cursor-pointer" title="Tým Pokémonů">
+                <span class="text-base md:text-lg">🎒</span>
+                <span class="hidden md:inline">TÝM</span>
+            </button>
+            <button id="nav-btn-dex" class="flex items-center space-x-2 p-2 rounded-xl bg-gray-800 hover:bg-rose-600 transition retro-border text-[8px] md:text-[9px] active:scale-95 cursor-pointer" title="Pokédex">
+                <span class="text-base md:text-lg">📖</span>
+                <span class="hidden md:inline">DEX</span>
+            </button>
+            <button id="nav-btn-arena" class="flex items-center space-x-2 p-2 rounded-xl bg-gray-800 hover:bg-yellow-600 transition retro-border text-[8px] md:text-[9px] active:scale-95 cursor-pointer" title="Bojová Aréna">
+                <span class="text-base md:text-lg">⚔️</span>
+                <span class="hidden md:inline">ARÉNA</span>
+            </button>
+            <button id="nav-btn-boss" class="flex items-center space-x-2 p-2 rounded-xl bg-gradient-to-r from-purple-900 to-indigo-900 hover:from-purple-700 hover:to-indigo-700 transition retro-purple-box text-[8px] md:text-[9px] active:scale-95 text-yellow-300 cursor-pointer" title="Boss Raid">
+                <span class="text-base md:text-lg">👑</span>
+                <span class="hidden md:inline">BOSS</span>
+            </button>
+        </div>
+
+        <div class="flex flex-col space-y-2">
+            <button id="btn-save-disk" class="flex items-center justify-center p-2 bg-emerald-700 hover:bg-emerald-600 text-[8px] rounded-xl retro-border active:scale-95 cursor-pointer">
+                💾 <span class="hidden md:inline ml-1">ULOŽIT</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- HLAVNÍ PLOCHA -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-black">
+
+        <header id="top-currency-bar" class="hidden absolute top-2 left-2 right-2 z-20 flex justify-between items-center pointer-events-none">
+            <button id="mobile-menu-trigger" class="sm:hidden pointer-events-auto bg-gray-900/90 retro-border p-2 rounded-xl text-xs active:scale-95 cursor-pointer">
+                ☰ MENU
+            </button>
+
+            <div id="zone-display-badge" class="pointer-events-auto bg-gray-900/90 border border-gray-700 px-3 py-1.5 rounded-full flex items-center space-x-2 text-[9px] shadow-lg">
+                <span id="zone-badge-icon">🌿</span>
+                <span id="zone-badge-name" class="text-emerald-300">Zóna 1: Smaragdové Louky</span>
+            </div>
+
+            <div class="pointer-events-auto flex items-center space-x-1 sm:space-x-2 text-[9px] sm:text-[10px]">
+                <div class="bg-gray-900/90 retro-gold-box px-2.5 py-1.5 rounded-xl flex items-center space-x-1.5 text-amber-300">
+                    <span>🪙</span>
+                    <span id="val-currency-gold" class="font-bold">0</span>
+                </div>
+                <div class="bg-gray-900/90 retro-border px-2.5 py-1.5 rounded-xl flex items-center space-x-1.5 text-purple-300">
+                    <span>🫐</span>
+                    <span id="val-currency-food" class="font-bold">5</span>
+                </div>
+                <div class="bg-gray-900/90 retro-purple-box px-2.5 py-1.5 rounded-xl flex items-center space-x-1.5 text-cyan-300">
+                    <span>🎟️</span>
+                    <span id="val-currency-tickets" class="font-bold">1</span>
+                </div>
+            </div>
+        </header>
+
+        <canvas id="overworldCanvas" class="w-full h-full block bg-emerald-950"></canvas>
+
+        <div id="overworld-prompt" class="hidden absolute top-16 left-1/2 transform -translate-x-1/2 z-20 pointer-events-none bg-black/90 border-2 border-yellow-400 px-4 py-2 rounded-xl text-center text-[10px] text-yellow-300 animate-pulse shadow-2xl">
+            [MEZERNÍK / A] Souboj a Chycení!
+        </div>
+
+        <div id="toast-banner" class="hidden absolute top-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none bg-blue-950/95 border-2 border-cyan-400 px-5 py-2.5 rounded-xl text-[9px] sm:text-xs text-white text-center shadow-2xl transition-opacity duration-300 max-w-sm">
+            Zpráva ze hry!
+        </div>
+
+        <div id="mobile-touch-layer" class="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20 pointer-events-none select-none">
+            <div id="virtual-joystick-zone" class="w-32 h-32 bg-gray-900/60 border-2 border-gray-500/70 rounded-full relative pointer-events-auto touch-none flex items-center justify-center backdrop-blur-sm shadow-2xl">
+                <div id="virtual-joystick-knob" class="w-12 h-12 bg-gradient-to-b from-red-500 to-rose-700 border-2 border-white rounded-full shadow-2xl transform translate-x-0 translate-y-0 transition-transform duration-75"></div>
+            </div>
+
+            <div class="flex flex-col space-y-2 pointer-events-auto items-end">
+                <button id="touch-btn-a" class="w-16 h-16 rounded-full bg-gradient-to-b from-red-600 to-rose-800 border-4 border-white text-white font-bold text-xs shadow-2xl active:scale-95 flex items-center justify-center flex-col cursor-pointer">
+                    <span>A</span>
+                    <span class="text-[7px] opacity-80">AKCE</span>
+                </button>
+                <div class="flex space-x-2">
+                    <button id="touch-btn-map" class="w-11 h-11 rounded-full bg-emerald-700 border-2 border-white text-white text-sm shadow-lg active:scale-95 flex items-center justify-center cursor-pointer">
+                        🗺️
+                    </button>
+                    <button id="touch-btn-team" class="w-11 h-11 rounded-full bg-blue-700 border-2 border-white text-white text-sm shadow-lg active:scale-95 flex items-center justify-center cursor-pointer">
+                        🎒
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TVORBA POSTAVY -->
+    <div id="screen-welcome" class="fixed inset-0 z-50 bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950 flex flex-col justify-center items-center p-4">
+        <div class="max-w-md w-full bg-gray-900/95 retro-border p-5 rounded-2xl flex flex-col items-center text-center shadow-2xl">
+            <h1 class="text-xl sm:text-2xl text-yellow-400 font-extrabold tracking-wider drop-shadow-[0_3px_0_#1e3a8a]">POKÉMON</h1>
+            <p class="text-[9px] text-cyan-300 mt-1 mb-4">LEGENDÁRNÍ EDICE PRO SYNA ⭐</p>
+
+            <div class="w-full text-left mb-3">
+                <label class="block text-yellow-300 text-[9px] mb-1">JMÉNO TRENÉRA:</label>
+                <input id="input-player-name" type="text" maxlength="12" value="Ash" class="w-full bg-black/90 border-2 border-gray-600 rounded-lg p-2 text-white text-xs focus:border-yellow-400 outline-none uppercase font-mono">
+            </div>
+
+            <div class="w-full text-left mb-3">
+                <label class="block text-yellow-300 text-[9px] mb-1">VZHLED TRENÉRA:</label>
+                <div class="grid grid-cols-4 gap-2">
+                    <button class="skin-btn p-2 border-2 border-yellow-400 bg-gray-800 rounded-xl flex flex-col items-center active:scale-95 cursor-pointer" data-skin="0">
+                        <span class="text-2xl">🧢</span>
+                        <span class="text-[7px] text-gray-300 mt-1">Klasik</span>
+                    </button>
+                    <button class="skin-btn p-2 border-2 border-gray-700 bg-gray-800 rounded-xl flex flex-col items-center active:scale-95 cursor-pointer" data-skin="1">
+                        <span class="text-2xl">👒</span>
+                        <span class="text-[7px] text-gray-300 mt-1">Průzkum</span>
+                    </button>
+                    <button class="skin-btn p-2 border-2 border-gray-700 bg-gray-800 rounded-xl flex flex-col items-center active:scale-95 cursor-pointer" data-skin="2">
+                        <span class="text-2xl">🥷</span>
+                        <span class="text-[7px] text-gray-300 mt-1">Ninja</span>
+                    </button>
+                    <button class="skin-btn p-2 border-2 border-gray-700 bg-gray-800 rounded-xl flex flex-col items-center active:scale-95 cursor-pointer" data-skin="3">
+                        <span class="text-2xl">👑</span>
+                        <span class="text-[7px] text-gray-300 mt-1">Šampion</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full text-left mb-4">
+                <label class="block text-yellow-300 text-[9px] mb-1">VYBER SI PRVNÍHO POKÉMONA (LVL 1):</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button class="starter-card p-2 border-2 border-green-500 bg-gray-800 rounded-xl flex flex-col items-center cursor-pointer" data-starter="1">
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" class="w-12 h-12 pixel-art" alt="Bulbasaur">
+                        <span class="text-[8px] text-green-300 mt-1">Bulbasaur</span>
+                        <span class="text-[7px] text-yellow-400">⭐⭐⭐</span>
+                    </button>
+                    <button class="starter-card p-2 border-2 border-transparent bg-gray-800 rounded-xl flex flex-col items-center cursor-pointer" data-starter="4">
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" class="w-12 h-12 pixel-art" alt="Charmander">
+                        <span class="text-[8px] text-red-300 mt-1">Charmander</span>
+                        <span class="text-[7px] text-yellow-400">⭐⭐⭐</span>
+                    </button>
+                    <button class="starter-card p-2 border-2 border-transparent bg-gray-800 rounded-xl flex flex-col items-center cursor-pointer" data-starter="7">
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" class="w-12 h-12 pixel-art" alt="Squirtle">
+                        <span class="text-[8px] text-blue-300 mt-1">Squirtle</span>
+                        <span class="text-[7px] text-yellow-400">⭐⭐⭐</span>
+                    </button>
+                </div>
+            </div>
+
+            <button id="btn-begin-game" class="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 retro-border py-3 rounded-xl text-yellow-300 text-xs font-bold shadow-xl active:scale-95 cursor-pointer">
+                ZAČÍT DOBRODRUŽSTVÍ! 🚀
+            </button>
+
+            <div id="continue-saved-container" class="mt-2.5 hidden w-full">
+                <button id="btn-load-continue" class="w-full bg-emerald-700 hover:bg-emerald-600 retro-border py-2 rounded-xl text-white text-[9px] active:scale-95 cursor-pointer">
+                    ▶ NAČÍST ULOŽENOU HRU
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: MAPA ZÓN -->
+    <div id="modal-map" class="fixed inset-0 z-40 bg-black/85 hidden flex justify-center items-center p-3">
+        <div class="w-full max-w-xl bg-gray-900 retro-border rounded-2xl p-4 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b-2 border-gray-700 pb-2 mb-3">
+                <div>
+                    <h2 class="text-xs sm:text-sm text-yellow-400 font-bold">🗺️ MAPA ZÓN A RYCHLÝ PŘESUN</h2>
+                    <p class="text-[8px] text-gray-400 mt-0.5">Vyber si zónu podle úrovně svých pokémonů!</p>
+                </div>
+                <button id="btn-close-map" class="bg-red-800 px-2.5 py-1 rounded text-white text-[10px] cursor-pointer">✕</button>
+            </div>
+            <div id="zones-list-container" class="flex-1 overflow-y-auto space-y-2.5 pr-1"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: TÝM A INVENTÁŘ -->
+    <div id="modal-team" class="fixed inset-0 z-40 bg-black/85 hidden flex justify-center items-center p-3">
+        <div class="w-full max-w-2xl bg-gray-900 retro-gold-box rounded-2xl p-4 flex flex-col max-h-[92vh]">
+            <div class="flex justify-between items-center border-b-2 border-amber-800 pb-2 mb-2">
+                <div>
+                    <h2 class="text-xs sm:text-sm text-yellow-400 font-bold">🎒 TVŮJ TÝM A INVENTÁŘ</h2>
+                    <p class="text-[8px] text-gray-400 mt-0.5">Po každém boji se všichni pokémoni sami vyléčí! 💖</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-purple-300 font-bold">🫐 <span id="team-berries-val">0</span></span>
+                    <button id="btn-close-team" class="bg-red-800 px-2 py-1 rounded text-white text-[10px] cursor-pointer">✕</button>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 mb-3 text-[8px]">
+                <span class="text-gray-400 self-center">ŘADIT:</span>
+                <button class="team-sort-btn px-2 py-1 bg-amber-700 rounded cursor-pointer" data-sort="cp">SÍLA (CP)</button>
+                <button class="team-sort-btn px-2 py-1 bg-gray-800 rounded cursor-pointer" data-sort="lvl">ÚROVEŇ</button>
+                <button class="team-sort-btn px-2 py-1 bg-gray-800 rounded cursor-pointer" data-sort="stars">HVĚZDY</button>
+                <button class="team-sort-btn px-2 py-1 bg-gray-800 rounded cursor-pointer" data-sort="name">JMÉNO</button>
+            </div>
+
+            <div id="team-cards-container" class="flex-1 overflow-y-auto space-y-2.5 pr-1"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: POKÉDEX -->
+    <div id="modal-dex" class="fixed inset-0 z-40 bg-black/85 hidden flex justify-center items-center p-3">
+        <div class="w-full max-w-3xl bg-red-950 retro-border rounded-2xl p-4 flex flex-col max-h-[92vh]">
+            <div class="flex justify-between items-center border-b-2 border-red-700 pb-2 mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">📖</span>
+                    <h2 class="text-xs sm:text-sm text-white font-bold">NÁRODNÍ POKÉDEX</h2>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-[9px] text-yellow-300 font-bold">CHYCENO: <span id="dex-caught-count">0/136</span></span>
+                    <button id="btn-close-dex" class="bg-gray-800 px-2 py-1 rounded text-white text-[10px] cursor-pointer">✕</button>
+                </div>
+            </div>
+            <div id="dex-cards-grid" class="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 pr-1"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: OBCHOD -->
+    <div id="modal-shop" class="fixed inset-0 z-40 bg-black/85 hidden flex justify-center items-center p-3">
+        <div class="w-full max-w-xl bg-gray-900 retro-gold-box rounded-2xl p-4 flex flex-col max-h-[92vh] relative">
+            <div class="flex justify-between items-center border-b-2 border-amber-800 pb-2 mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl">🛒</span>
+                    <div>
+                        <h2 class="text-xs sm:text-sm text-yellow-400 font-bold">ZLATÝ POKÉ-OBCHOD</h2>
+                        <p class="text-[8px] text-gray-400">Zlaťáky 🪙 získáš v dole "Gold Pokémon Miner"!</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-[10px] text-amber-300 font-bold">🪙 <span id="shop-gold-display">0</span></span>
+                    <button id="btn-close-shop" class="bg-red-800 px-2 py-1 rounded text-white text-[10px] cursor-pointer">✕</button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-3 pr-1">
+                <div class="bg-gray-800/90 retro-border p-3 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">🎟️</span>
+                        <div>
+                            <div class="text-[10px] font-bold text-cyan-300">Vstupenka na Bosse</div>
+                            <div class="text-[8px] text-gray-400 mt-0.5">Umožní okamžitý další Boss Raid bez čekání 24h.</div>
+                        </div>
+                    </div>
+                    <button id="btn-buy-ticket" class="bg-amber-600 hover:bg-amber-500 retro-border px-3 py-2 rounded-xl text-[9px] font-bold active:scale-95 text-yellow-200 cursor-pointer">
+                        150 🪙 Koupit
+                    </button>
+                </div>
+
+                <div class="bg-gray-800/90 retro-border p-3 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">🫐</span>
+                        <div>
+                            <div class="text-[10px] font-bold text-purple-300">Balíček Bobulí (x10)</div>
+                            <div class="text-[8px] text-gray-400 mt-0.5">Chutné jídlo pro evoluci tvých Pokémonů!</div>
+                        </div>
+                    </div>
+                    <button id="btn-buy-food" class="bg-amber-600 hover:bg-amber-500 retro-border px-3 py-2 rounded-xl text-[9px] font-bold active:scale-95 text-yellow-200 cursor-pointer">
+                        100 🪙 Koupit
+                    </button>
+                </div>
+
+                <div class="bg-gradient-to-r from-amber-950/60 to-purple-950/60 retro-gold-box p-3 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl animate-bounce">🎁</span>
+                        <div>
+                            <div class="text-[10px] font-bold text-yellow-300">Záhadné Vejce (Mystery Box)</div>
+                            <div class="text-[8px] text-gray-300 mt-0.5">Vylíhne se náhodný vzácný Pokémon s ⭐⭐⭐+!</div>
+                        </div>
+                    </div>
+                    <button id="btn-buy-egg" class="bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 retro-border px-3 py-2 rounded-xl text-[9px] font-bold active:scale-95 text-black cursor-pointer">
+                        300 🪙 Otevřít
+                    </button>
+                </div>
+            </div>
+
+            <div id="hatch-overlay" class="hidden absolute inset-0 bg-black/95 rounded-2xl flex flex-col items-center justify-center p-4 z-50">
+                <h3 id="hatch-title" class="text-xs text-yellow-300 mb-4 animate-pulse">VEJCE SE KLUBE...</h3>
+                <div id="egg-actor" class="text-6xl animate-egg my-4">🥚</div>
+                <div id="hatched-poke-display" class="hidden flex flex-col items-center animate-bounce">
+                    <img id="hatched-img" src="" class="w-24 h-24 pixel-art filter drop-shadow-2xl" alt="Hatched">
+                    <span id="hatched-name" class="text-sm font-bold text-yellow-300 mt-2">Pikachu</span>
+                    <span id="hatched-stars" class="text-xs text-amber-400 mt-1">⭐⭐⭐⭐</span>
+                </div>
+                <button id="btn-finish-hatch" class="hidden mt-4 bg-emerald-600 hover:bg-emerald-500 retro-border px-4 py-2 rounded-xl text-[10px] text-white cursor-pointer">
+                    PŘEVZÍT POKÉMONA! 🎉
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: BOSS RAID SELECTION -->
+    <div id="modal-boss" class="fixed inset-0 z-40 bg-black/85 hidden flex justify-center items-center p-3">
+        <div class="w-full max-w-xl bg-purple-950 retro-purple-box rounded-2xl p-4 flex flex-col max-h-[92vh]">
+            <div class="flex justify-between items-center border-b-2 border-purple-700 pb-2 mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">👑</span>
+                    <div>
+                        <h2 class="text-xs sm:text-sm text-yellow-300 font-bold">LEGENDÁRNÍ BOSS RAID</h2>
+                        <p class="text-[8px] text-purple-200">Sestav elitní 5členný tým a pokus se porazit a chytit legendu!</p>
+                    </div>
+                </div>
+                <button id="btn-close-boss" class="bg-gray-800 px-2 py-1 rounded text-white text-[10px] cursor-pointer">✕</button>
+            </div>
+
+            <div class="bg-gray-900/90 retro-border p-3 rounded-xl flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-3">
+                    <img id="current-boss-sprite" src="" class="w-16 h-16 pixel-art filter drop-shadow-lg" alt="Boss">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span id="current-boss-name" class="text-xs font-bold text-yellow-300">Mewtwo</span>
+                            <span id="current-boss-elem-badge" class="text-[10px]">🔮</span>
+                            <span id="current-boss-tier-badge" class="bg-red-800 text-[7px] text-yellow-200 px-1.5 py-0.5 rounded font-bold">ÚROVEŇ 1</span>
+                            <button id="btn-boss-info" class="bg-cyan-700 hover:bg-cyan-600 text-white rounded-full w-5 h-5 text-[8px] font-bold flex items-center justify-center cursor-pointer">
+                                i
+                            </button>
+                        </div>
+                        <div class="text-[8px] text-gray-300 mt-1">
+                            HP: <span id="current-boss-hp-val" class="text-emerald-400 font-bold">3200</span> | CP: <span id="current-boss-cp-val" class="text-yellow-400 font-bold">9500</span>
+                        </div>
+                        <div id="boss-daily-timer" class="text-[8px] text-yellow-400 mt-1">
+                            Vstup: <span id="boss-timer-text">PŘIPRAVENO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center text-[8px] text-yellow-300 mb-2">
+                <span>VYBER 5 POKÉMONŮ (VYBRÁNO: <span id="raid-selected-count">0</span>/5):</span>
+                <span>ŠANCE: <span id="raid-chance-text" class="text-green-400 font-bold">0%</span></span>
+            </div>
+            <div id="raid-pick-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1 overflow-y-auto mb-3"></div>
+
+            <button id="btn-start-raid" class="w-full bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-600 retro-border py-3 rounded-xl text-yellow-300 text-xs font-bold tracking-wider active:scale-95 cursor-pointer">
+                ⚔️ VSTOUPIT DO NÁJEZDU!
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: INFO O BOSSOVI ("i") -->
+    <div id="modal-boss-info-card" class="fixed inset-0 z-50 bg-black/90 hidden flex justify-center items-center p-4">
+        <div class="w-full max-w-sm bg-gray-900 retro-purple-box rounded-2xl p-4 text-center">
+            <img id="info-boss-img" src="" class="w-20 h-20 pixel-art mx-auto" alt="Boss Info">
+            <h3 id="info-boss-name" class="text-sm font-bold text-yellow-300 mt-2">Mewtwo</h3>
+            <p id="info-boss-type" class="text-[9px] text-cyan-300 mt-1">Typ: Psychic</p>
+            <div class="bg-gray-800 p-2.5 rounded-xl retro-border my-3 text-[8px] text-left text-gray-200 space-y-1">
+                <div>💥 <b>Hlavní útok:</b> <span id="info-boss-skill">Psychické Zničení</span></div>
+                <div>🛡️ <b>Slabina:</b> <span id="info-boss-weakness" class="text-yellow-400">Ghost / Temnota</span></div>
+                <div>🎁 <b>Odměna za poražení:</b> 500 🪙 Zlata + 15 🫐 Bobulí!</div>
+                <div>🔴 <b>Chycení:</b> Po porážce máš možnost tuto legendu chytit do Master Ballu!</div>
+            </div>
+            <button id="btn-close-boss-info" class="w-full bg-purple-800 hover:bg-purple-700 retro-border py-2 rounded-xl text-[9px] text-white cursor-pointer">
+                ZAVŘÍT
+            </button>
+        </div>
+    </div>
+
+    <!-- SOUBOJOVÁ OBRAZOVKA -->
+    <div id="screen-combat-arena" class="fixed inset-0 z-40 bg-gradient-to-b from-sky-950 via-slate-900 to-gray-950 hidden flex flex-col justify-between p-3 sm:p-5">
+        <div class="flex justify-between items-center bg-black/80 px-3 py-2 rounded-xl border border-yellow-500 shadow-lg">
+            <div class="flex items-center space-x-2">
+                <span id="combat-mode-badge" class="bg-red-800 px-2 py-0.5 rounded text-[8px] text-yellow-300 font-bold">DIVOKÝ SOUBOJ</span>
+                <span id="combat-zone-info" class="text-[9px] text-cyan-300">Zóna 1</span>
+            </div>
+            <button id="btn-escape-combat" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-[8px] px-3 py-1 rounded text-red-300 active:scale-95 cursor-pointer">
+                ÚTĚK 🏃
+            </button>
+        </div>
+
+        <div id="combat-stage-box" class="flex-1 flex flex-col justify-center items-center relative my-2 overflow-hidden bg-gradient-to-b from-emerald-950/40 to-slate-900/90 rounded-2xl border-4 border-slate-700 shadow-2xl">
+            <canvas id="combatFxCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
+
+            <!-- Soupeř / Boss -->
+            <div class="absolute top-4 right-4 sm:right-12 flex flex-col items-end z-10">
+                <div class="bg-gray-900/95 retro-border p-2 sm:p-3 rounded-xl min-w-[160px] sm:min-w-[210px] text-[8px] sm:text-[9px] mb-2 shadow-2xl">
+                    <div class="flex justify-between items-center font-bold">
+                        <div class="flex items-center space-x-1">
+                            <span id="enemy-display-name" class="text-red-400">ENEMY</span>
+                            <span id="enemy-elem-icon">⚡</span>
+                        </div>
+                        <span class="text-gray-300">LV <span id="enemy-display-lvl">1</span></span>
+                    </div>
+                    <div class="flex items-center space-x-1 my-1">
+                        <span class="text-[7px] text-gray-400">HODNOCENÍ:</span>
+                        <span id="enemy-display-stars" class="text-yellow-400 text-xs">⭐⭐⭐</span>
+                    </div>
+                    <div class="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden border border-gray-600 mt-1">
+                        <div id="enemy-hp-fill" class="bg-green-500 h-full w-full transition-all duration-300"></div>
+                    </div>
+                    <div class="text-right text-[7px] text-gray-400 mt-1">
+                        HP: <span id="enemy-hp-num">100/100</span>
+                    </div>
+                </div>
+                <div id="enemy-sprite-holder" class="w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center relative">
+                    <img id="enemy-sprite-img" src="" class="w-full h-full pixel-art filter drop-shadow-xl transition-all duration-300" alt="Enemy">
+                    <div id="flying-pokeball" class="hidden absolute w-12 h-12 z-30 pointer-events-none">
+                        <div id="ball-graphic" class="w-full h-full text-3xl text-center leading-none">🔴</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hráčův Pokémon -->
+            <div class="absolute bottom-4 left-4 sm:left-12 flex flex-col items-start z-10">
+                <div id="player-sprite-holder" class="w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center">
+                    <img id="player-sprite-img" src="" class="w-full h-full pixel-art filter drop-shadow-xl" alt="Player Pokemon">
+                </div>
+                <div class="bg-gray-900/95 retro-border p-2 sm:p-3 rounded-xl min-w-[160px] sm:min-w-[210px] text-[8px] sm:text-[9px] mt-2 shadow-2xl">
+                    <div class="flex justify-between items-center font-bold">
+                        <div class="flex items-center space-x-1">
+                            <span id="player-display-name" class="text-cyan-400">HERO</span>
+                            <span id="player-elem-icon">🔥</span>
+                        </div>
+                        <span class="text-gray-300">LV <span id="player-display-lvl">1</span></span>
+                    </div>
+                    <div class="flex items-center space-x-1 my-1">
+                        <span class="text-[7px] text-gray-400">HODNOCENÍ:</span>
+                        <span id="player-display-stars" class="text-yellow-400 text-xs">⭐⭐⭐⭐</span>
+                    </div>
+                    <div class="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden border border-gray-600 mt-1">
+                        <div id="player-hp-fill" class="bg-green-500 h-full w-full transition-all duration-300"></div>
+                    </div>
+                    <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden border border-gray-700 mt-1">
+                        <div id="player-exp-fill" class="bg-cyan-400 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                    <div class="flex justify-between text-[7px] text-gray-400 mt-1">
+                        <span>HP: <span id="player-hp-num">100/100</span></span>
+                        <span>EXP: <span id="player-exp-num">0%</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Akční pole -->
+        <div class="bg-gray-950 retro-border p-3 rounded-2xl flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+            <div id="combat-log-text" class="flex-1 bg-black/90 p-3 rounded-xl border border-gray-700 text-[9px] sm:text-[10px] text-yellow-300 min-h-[64px] flex items-center font-mono">
+                Co udělá tvůj Pokémon?
+            </div>
+            <div id="combat-actions-grid" class="grid grid-cols-2 gap-2 sm:w-80"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: VÝMĚNA POKÉMONA BĚHEM SOUBOJE -->
+    <div id="modal-combat-switch" class="fixed inset-0 z-50 bg-black/90 hidden flex justify-center items-center p-3">
+        <div class="w-full max-w-xl bg-gray-900 retro-border rounded-2xl p-4 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b-2 border-gray-700 pb-2 mb-3">
+                <div>
+                    <h2 class="text-xs sm:text-sm text-yellow-400 font-bold">🔄 VÝMĚNA POKÉMONA V BOJI</h2>
+                    <p class="text-[8px] text-gray-400 mt-0.5">Vyber čilého Pokémona, který nastoupí do zápasu!</p>
+                </div>
+                <button id="btn-close-combat-switch" class="bg-red-800 px-2.5 py-1 rounded text-white text-[10px] cursor-pointer">✕</button>
+            </div>
+            <div id="combat-switch-list" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+    </div>
+
+    <!-- SPECIÁLNÍ ANIMACE PRO CHYCENÍ BOSSE (PRO SYNA) -->
+    <div id="screen-boss-capture-celebration" class="fixed inset-0 z-50 bg-black/95 hidden flex flex-col justify-center items-center p-4 text-center">
+        <div class="text-4xl mb-2 animate-bounce">✨ 👑 ✨</div>
+        <h1 class="text-xl sm:text-2xl text-yellow-300 font-extrabold tracking-wider animate-pulse">LEGENDÁRNÍ ÚLOVEK!</h1>
+        <p class="text-[9px] sm:text-[10px] text-cyan-300 mt-1">BOSS BYL ÚSPĚŠNĚ CHYCEN DO MASTER BALLU!</p>
+
+        <div class="my-5 relative flex items-center justify-center">
+            <div class="absolute w-44 h-44 bg-purple-600/30 rounded-full blur-2xl animate-ping"></div>
+            <img id="celebrate-boss-img" src="" class="w-36 h-36 pixel-art relative z-10 animate-victory" alt="Captured Boss">
+        </div>
+
+        <h2 id="celebrate-boss-name" class="text-lg text-white font-bold text-yellow-400">MEWTWO</h2>
+        <div class="text-xs text-yellow-400 mt-1">⭐⭐⭐⭐ (MAX HODNOCENÍ)</div>
+        <p class="text-[8px] text-emerald-300 mt-2 bg-emerald-950/80 border border-emerald-500/50 px-4 py-2 rounded-xl">
+            Odteď bojuje po tvém boku! Přidán do tvého týmu na Lv. 1!
+        </p>
+
+        <button id="btn-finish-boss-celebration" class="mt-5 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 retro-border px-6 py-3 rounded-xl text-black font-extrabold text-[10px] active:scale-95 cursor-pointer shadow-2xl">
+            VÍTĚZNÝ NÁVRAT! 🚀
+        </button>
+    </div>
+
+    <!-- OVERLAY VÍTĚZ / PROHRA -->
+    <div id="screen-result-overlay" class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col justify-center items-center p-4 text-center">
+        <h1 id="result-title" class="text-3xl text-yellow-400 font-extrabold tracking-wider animate-bounce">VÍTĚZ! 🏆</h1>
+        <p id="result-desc" class="text-xs text-gray-300 mt-3 max-w-md leading-relaxed">Vyhrál jsi zápas a získáváš bohatou odměnu!</p>
+        <div class="flex space-x-3 mt-6">
+            <button id="btn-result-action" class="bg-emerald-700 hover:bg-emerald-600 retro-border px-5 py-2.5 rounded-xl text-[10px] font-bold cursor-pointer">
+                DALŠÍ ZÁPAS
+            </button>
+            <button id="btn-result-exit" class="bg-gray-800 hover:bg-gray-700 retro-border px-5 py-2.5 rounded-xl text-[10px] font-bold cursor-pointer">
+                ODEJÍT
+            </button>
+        </div>
+    </div>
+
+<script>
+/* ==========================================================================
+   1. RETRO SYNTEZÁTOR
+   ========================================================================== */
+class ChiptuneSynth {
+    constructor() { this.ctx = null; }
+    init() {
+        if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    }
+    tone(freq, type = 'square', dur = 0.1, gainVal = 0.08) {
+        if (!this.ctx) return;
+        try {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + dur);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + dur);
+        } catch(e) {}
+    }
+    skillSfx(type) {
+        this.init();
+        if (type === 'Fire') {
+            for (let i = 0; i < 4; i++) setTimeout(() => this.tone(220 + Math.random() * 260, 'sawtooth', 0.09, 0.09), i * 55);
+        } else if (type === 'Water') {
+            for (let i = 0; i < 3; i++) setTimeout(() => this.tone(480 - i * 70, 'sine', 0.12, 0.1), i * 65);
+        } else if (type === 'Electric') {
+            this.tone(900, 'sawtooth', 0.08, 0.12);
+            setTimeout(() => this.tone(1300, 'square', 0.08, 0.12), 45);
+        } else {
+            this.tone(150, 'triangle', 0.14, 0.14);
+        }
+    }
+    throwBall() {
+        this.init();
+        this.tone(550, 'sine', 0.08, 0.1);
+        setTimeout(() => this.tone(750, 'triangle', 0.09, 0.1), 80);
+    }
+    shakeBall() {
+        this.init();
+        this.tone(260, 'triangle', 0.09, 0.1);
+    }
+    fanfare() {
+        this.init();
+        [523, 659, 783, 1046, 1318].forEach((f, idx) => setTimeout(() => this.tone(f, 'triangle', 0.22, 0.15), idx * 110));
+    }
+    legendaryFanfare() {
+        this.init();
+        const melody = [523, 659, 783, 1046, 783, 1046, 1318, 1567];
+        melody.forEach((f, idx) => setTimeout(() => this.tone(f, 'square', 0.25, 0.16), idx * 130));
+    }
+    defeat() {
+        this.init();
+        [320, 290, 260, 200].forEach((f, idx) => setTimeout(() => this.tone(f, 'sawtooth', 0.25, 0.12), idx * 120));
+    }
+    goldSfx() {
+        this.init();
+        this.tone(987, 'sine', 0.08, 0.1);
+        setTimeout(() => this.tone(1318, 'sine', 0.15, 0.1), 80);
+    }
+}
+const sfx = new ChiptuneSynth();
+
+/* ==========================================================================
+   2. ELEMENT MATICE & IKONY
+   ========================================================================== */
+const ELEMENT_ICONS = {
+    Fire: "🔥", Water: "💧", Grass: "🌿", Electric: "⚡",
+    Rock: "🪨", Ghost: "👻", Psychic: "🔮", Dragon: "🐉",
+    Poison: "☠️", Normal: "⭐"
+};
+
+function getElementMultiplier(atkType, defType) {
+    if (!atkType || !defType) return 1.0;
+    const table = {
+        Fire: { Grass: 2.2, Water: 0.55, Rock: 0.55, Fire: 0.6, Dragon: 0.6 },
+        Water: { Fire: 2.2, Rock: 2.2, Grass: 0.55, Water: 0.6, Dragon: 0.6 },
+        Grass: { Water: 2.2, Rock: 2.2, Fire: 0.55, Grass: 0.6, Poison: 0.55, Dragon: 0.6 },
+        Electric: { Water: 2.2, Electric: 0.6, Grass: 0.55, Rock: 0.0, Dragon: 0.6 },
+        Rock: { Fire: 2.2, Electric: 1.8, Grass: 0.55 },
+        Ghost: { Psychic: 2.2, Ghost: 2.2, Normal: 0.0 },
+        Psychic: { Poison: 2.2, Psychic: 0.6 },
+        Dragon: { Dragon: 2.2 },
+        Poison: { Grass: 2.2, Rock: 0.55, Ghost: 0.55, Poison: 0.6 },
+        Normal: { Rock: 0.55, Ghost: 0.0 }
+    };
+    return table[atkType] && table[atkType][defType] !== undefined ? table[atkType][defType] : 1.0;
+}
+
+/* ==========================================================================
+   3. POKÉMON DATABASE & SPRITES
+   ========================================================================== */
+function getSpriteUrl(id) {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+}
+
+const POKEMON_DATABASE = [
+    { id: 1, name: "Bulbasaur", type: "Grass", baseHp: 80, baseAtk: 20, evolvesTo: 2, foodCost: 15, moves: [{ name: "Náraz", type: "Normal", pwr: 20 }, { name: "Listová břitva", type: "Grass", pwr: 35 }] },
+    { id: 2, name: "Ivysaur", type: "Grass", baseHp: 125, baseAtk: 32, evolvesTo: 3, foodCost: 35, moves: [{ name: "Travní bič", type: "Grass", pwr: 42 }, { name: "Semenná bomba", type: "Grass", pwr: 52 }] },
+    { id: 3, name: "Venusaur", type: "Grass", baseHp: 185, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Sluneční paprsek", type: "Grass", pwr: 68 }, { name: "Zemětřesení", type: "Rock", pwr: 60 }] },
+    { id: 4, name: "Charmander", type: "Fire", baseHp: 75, baseAtk: 22, evolvesTo: 5, foodCost: 15, moves: [{ name: "Škrábnutí", type: "Normal", pwr: 20 }, { name: "Uhlík", type: "Fire", pwr: 35 }] },
+    { id: 5, name: "Charmeleon", type: "Fire", baseHp: 118, baseAtk: 35, evolvesTo: 6, foodCost: 35, moves: [{ name: "Plamenný tesák", type: "Fire", pwr: 45 }, { name: "Dračí dech", type: "Dragon", pwr: 50 }] },
+    { id: 6, name: "Charizard", type: "Fire", baseHp: 180, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Pekelný oheň", type: "Fire", pwr: 70 }, { name: "Dračí dráp", type: "Dragon", pwr: 62 }] },
+    { id: 7, name: "Squirtle", type: "Water", baseHp: 85, baseAtk: 19, evolvesTo: 8, foodCost: 15, moves: [{ name: "Náraz", type: "Normal", pwr: 20 }, { name: "Vodní pistole", type: "Water", pwr: 35 }] },
+    { id: 8, name: "Wartortle", type: "Water", baseHp: 130, baseAtk: 30, evolvesTo: 9, foodCost: 35, moves: [{ name: "Vodní puls", type: "Water", pwr: 42 }, { name: "Krunýřový úder", type: "Normal", pwr: 45 }] },
+    { id: 9, name: "Blastoise", type: "Water", baseHp: 190, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Hydro Pumpa", type: "Water", pwr: 70 }, { name: "Ledový paprsek", type: "Water", pwr: 60 }] },
+    { id: 10, name: "Caterpie", type: "Grass", baseHp: 65, baseAtk: 14, evolvesTo: 11, foodCost: 8, moves: [{ name: "Náraz", type: "Normal", pwr: 18 }] },
+    { id: 11, name: "Metapod", type: "Grass", baseHp: 95, baseAtk: 18, evolvesTo: 12, foodCost: 15, moves: [{ name: "Zpevnění", type: "Normal", pwr: 22 }] },
+    { id: 12, name: "Butterfree", type: "Grass", baseHp: 135, baseAtk: 36, evolvesTo: null, foodCost: 0, moves: [{ name: "Stříbrný vítr", type: "Grass", pwr: 48 }, { name: "Pyl spánku", type: "Grass", pwr: 54 }] },
+    { id: 13, name: "Weedle", type: "Grass", baseHp: 65, baseAtk: 15, evolvesTo: 14, foodCost: 8, moves: [{ name: "Žihadlo", type: "Normal", pwr: 18 }] },
+    { id: 14, name: "Kakuna", type: "Grass", baseHp: 95, baseAtk: 18, evolvesTo: 15, foodCost: 15, moves: [{ name: "Železná obrana", type: "Normal", pwr: 22 }] },
+    { id: 15, name: "Beedrill", type: "Grass", baseHp: 135, baseAtk: 42, evolvesTo: null, foodCost: 0, moves: [{ name: "Dvojité bodnutí", type: "Grass", pwr: 50 }, { name: "Jehlový déšť", type: "Grass", pwr: 56 }] },
+    { id: 16, name: "Pidgey", type: "Normal", baseHp: 70, baseAtk: 17, evolvesTo: 17, foodCost: 12, moves: [{ name: "Klovnutí", type: "Normal", pwr: 20 }] },
+    { id: 17, name: "Pidgeotto", type: "Normal", baseHp: 110, baseAtk: 28, evolvesTo: 18, foodCost: 25, moves: [{ name: "Větrný vír", type: "Normal", pwr: 38 }] },
+    { id: 18, name: "Pidgeot", type: "Normal", baseHp: 160, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Vzdušné eso", type: "Normal", pwr: 58 }, { name: "Hurikán", type: "Normal", pwr: 65 }] },
+    { id: 19, name: "Rattata", type: "Normal", baseHp: 60, baseAtk: 18, evolvesTo: 20, foodCost: 12, moves: [{ name: "Kousnutí", type: "Normal", pwr: 20 }] },
+    { id: 20, name: "Raticate", type: "Normal", baseHp: 130, baseAtk: 38, evolvesTo: null, foodCost: 0, moves: [{ name: "Hyper Tesák", type: "Normal", pwr: 54 }] },
+    { id: 21, name: "Spearow", type: "Normal", baseHp: 65, baseAtk: 20, evolvesTo: 22, foodCost: 14, moves: [{ name: "Klovnutí", type: "Normal", pwr: 22 }] },
+    { id: 22, name: "Fearow", type: "Normal", baseHp: 140, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Vrtací Zobák", type: "Normal", pwr: 55 }] },
+    { id: 23, name: "Ekans", type: "Poison", baseHp: 70, baseAtk: 20, evolvesTo: 24, foodCost: 18, moves: [{ name: "Jedové kousnutí", type: "Normal", pwr: 24 }] },
+    { id: 24, name: "Arbok", type: "Poison", baseHp: 145, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Kyselina", type: "Normal", pwr: 56 }] },
+    { id: 25, name: "Pikachu", type: "Electric", baseHp: 75, baseAtk: 24, evolvesTo: 26, foodCost: 25, moves: [{ name: "Bleskový šok", type: "Electric", pwr: 35 }, { name: "Rychlý útok", type: "Normal", pwr: 25 }] },
+    { id: 26, name: "Raichu", type: "Electric", baseHp: 155, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Blesková bouře", type: "Electric", pwr: 68 }, { name: "Železný ocas", type: "Normal", pwr: 52 }] },
+    { id: 27, name: "Sandshrew", type: "Rock", baseHp: 80, baseAtk: 22, evolvesTo: 28, foodCost: 20, moves: [{ name: "Škrábnutí", type: "Normal", pwr: 20 }, { name: "Písečný útok", type: "Rock", pwr: 30 }] },
+    { id: 28, name: "Sandslash", type: "Rock", baseHp: 150, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Zemětřesení", type: "Rock", pwr: 60 }, { name: "Drtivý dráp", type: "Normal", pwr: 50 }] },
+    { id: 29, name: "Nidoran♀", type: "Normal", baseHp: 75, baseAtk: 19, evolvesTo: 31, foodCost: 25, moves: [{ name: "Bodnutí", type: "Normal", pwr: 22 }] },
+    { id: 31, name: "Nidoqueen", type: "Rock", baseHp: 175, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Zemní síla", type: "Rock", pwr: 64 }, { name: "Tělesný dopad", type: "Normal", pwr: 56 }] },
+    { id: 32, name: "Nidoran♂", type: "Normal", baseHp: 75, baseAtk: 21, evolvesTo: 34, foodCost: 25, moves: [{ name: "Bodnutí rohem", type: "Normal", pwr: 24 }] },
+    { id: 34, name: "Nidoking", type: "Rock", baseHp: 175, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Megaroh", type: "Rock", pwr: 66 }, { name: "Zemětřesení", type: "Rock", pwr: 64 }] },
+    { id: 35, name: "Clefairy", type: "Normal", baseHp: 90, baseAtk: 20, evolvesTo: 36, foodCost: 20, moves: [{ name: "Měsíční paprsek", type: "Normal", pwr: 32 }] },
+    { id: 36, name: "Clefable", type: "Normal", baseHp: 165, baseAtk: 42, evolvesTo: null, foodCost: 0, moves: [{ name: "Měsíční síla", type: "Normal", pwr: 60 }] },
+    { id: 37, name: "Vulpix", type: "Fire", baseHp: 70, baseAtk: 22, evolvesTo: 38, foodCost: 20, moves: [{ name: "Plamének", type: "Fire", pwr: 30 }] },
+    { id: 38, name: "Ninetales", type: "Fire", baseHp: 155, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Ohnivý vír", type: "Fire", pwr: 62 }, { name: "Záblesk slunce", type: "Fire", pwr: 58 }] },
+    { id: 39, name: "Jigglypuff", type: "Normal", baseHp: 110, baseAtk: 16, evolvesTo: 40, foodCost: 20, moves: [{ name: "Ukolébavka", type: "Normal", pwr: 24 }] },
+    { id: 40, name: "Wigglytuff", type: "Normal", baseHp: 190, baseAtk: 38, evolvesTo: null, foodCost: 0, moves: [{ name: "Dvojitá facka", type: "Normal", pwr: 54 }] },
+    { id: 41, name: "Zubat", type: "Ghost", baseHp: 70, baseAtk: 19, evolvesTo: 42, foodCost: 20, moves: [{ name: "Sání krve", type: "Ghost", pwr: 24 }] },
+    { id: 42, name: "Golbat", type: "Ghost", baseHp: 145, baseAtk: 42, evolvesTo: null, foodCost: 0, moves: [{ name: "Vzdušný řezák", type: "Ghost", pwr: 58 }] },
+    { id: 43, name: "Oddish", type: "Grass", baseHp: 70, baseAtk: 20, evolvesTo: 45, foodCost: 25, moves: [{ name: "Kyselina", type: "Grass", pwr: 28 }] },
+    { id: 45, name: "Vileplume", type: "Grass", baseHp: 160, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Okvětní bouře", type: "Grass", pwr: 64 }] },
+    { id: 46, name: "Paras", type: "Grass", baseHp: 70, baseAtk: 24, evolvesTo: 47, foodCost: 18, moves: [{ name: "Škrábání", type: "Normal", pwr: 24 }] },
+    { id: 47, name: "Parasect", type: "Grass", baseHp: 145, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Spory houby", type: "Grass", pwr: 58 }] },
+    { id: 48, name: "Venonat", type: "Grass", baseHp: 75, baseAtk: 22, evolvesTo: 49, foodCost: 20, moves: [{ name: "Zmatení", type: "Normal", pwr: 28 }] },
+    { id: 49, name: "Venomoth", type: "Grass", baseHp: 150, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Psychovlna", type: "Normal", pwr: 60 }] },
+    { id: 50, name: "Diglett", type: "Rock", baseHp: 55, baseAtk: 22, evolvesTo: 51, foodCost: 18, moves: [{ name: "Škrábnutí", type: "Normal", pwr: 22 }] },
+    { id: 51, name: "Dugtrio", type: "Rock", baseHp: 125, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Zemní trhlina", type: "Rock", pwr: 60 }] },
+    { id: 52, name: "Meowth", type: "Normal", baseHp: 70, baseAtk: 20, evolvesTo: 53, foodCost: 18, moves: [{ name: "Kočičí dráp", type: "Normal", pwr: 26 }] },
+    { id: 53, name: "Persian", type: "Normal", baseHp: 140, baseAtk: 42, evolvesTo: null, foodCost: 0, moves: [{ name: "Temný sek", type: "Normal", pwr: 56 }] },
+    { id: 54, name: "Psyduck", type: "Water", baseHp: 80, baseAtk: 22, evolvesTo: 55, foodCost: 22, moves: [{ name: "Vodní puls", type: "Water", pwr: 30 }] },
+    { id: 55, name: "Golduck", type: "Water", baseHp: 155, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Hydro vlna", type: "Water", pwr: 60 }, { name: "Psychický úder", type: "Psychic", pwr: 55 }] },
+    { id: 56, name: "Mankey", type: "Normal", baseHp: 70, baseAtk: 26, evolvesTo: 57, foodCost: 20, moves: [{ name: "Karate úder", type: "Normal", pwr: 30 }] },
+    { id: 57, name: "Primeape", type: "Normal", baseHp: 145, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Zuřivý pěstní úder", type: "Normal", pwr: 62 }] },
+    { id: 58, name: "Growlithe", type: "Fire", baseHp: 85, baseAtk: 26, evolvesTo: 59, foodCost: 25, moves: [{ name: "Plamenné kousnutí", type: "Fire", pwr: 34 }] },
+    { id: 59, name: "Arcanine", type: "Fire", baseHp: 180, baseAtk: 54, evolvesTo: null, foodCost: 0, moves: [{ name: "Ohnivý blesk", type: "Fire", pwr: 70 }, { name: "Extrémní rychlost", type: "Normal", pwr: 58 }] },
+    { id: 60, name: "Poliwag", type: "Water", baseHp: 70, baseAtk: 18, evolvesTo: 62, foodCost: 25, moves: [{ name: "Vodní dělo", type: "Water", pwr: 28 }] },
+    { id: 62, name: "Poliwrath", type: "Water", baseHp: 170, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Hydro pumpa", type: "Water", pwr: 66 }, { name: "Dynamická pěst", type: "Normal", pwr: 60 }] },
+    { id: 63, name: "Abra", type: "Psychic", baseHp: 55, baseAtk: 28, evolvesTo: 65, foodCost: 25, moves: [{ name: "Psychický paprsek", type: "Psychic", pwr: 36 }] },
+    { id: 65, name: "Alakazam", type: "Psychic", baseHp: 140, baseAtk: 56, evolvesTo: null, foodCost: 0, moves: [{ name: "Psychokinese", type: "Psychic", pwr: 74 }, { name: "Stínová koule", type: "Ghost", pwr: 58 }] },
+    { id: 66, name: "Machop", type: "Normal", baseHp: 85, baseAtk: 26, evolvesTo: 68, foodCost: 25, moves: [{ name: "Nízký kop", type: "Normal", pwr: 30 }] },
+    { id: 68, name: "Machamp", type: "Normal", baseHp: 175, baseAtk: 54, evolvesTo: null, foodCost: 0, moves: [{ name: "Čtyřnásobný drtič", type: "Normal", pwr: 70 }, { name: "Křížový sek", type: "Normal", pwr: 62 }] },
+    { id: 69, name: "Bellsprout", type: "Grass", baseHp: 70, baseAtk: 22, evolvesTo: 71, foodCost: 25, moves: [{ name: "Bič", type: "Grass", pwr: 28 }] },
+    { id: 71, name: "Victreebel", type: "Grass", baseHp: 160, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Listová smršť", type: "Grass", pwr: 66 }] },
+    { id: 72, name: "Tentacool", type: "Water", baseHp: 70, baseAtk: 19, evolvesTo: 73, foodCost: 22, moves: [{ name: "Kyselina", type: "Water", pwr: 28 }] },
+    { id: 73, name: "Tentacruel", type: "Water", baseHp: 160, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Hydro puls", type: "Water", pwr: 62 }] },
+    { id: 74, name: "Geodude", type: "Rock", baseHp: 75, baseAtk: 24, evolvesTo: 76, foodCost: 25, moves: [{ name: "Vrh balvanu", type: "Rock", pwr: 30 }] },
+    { id: 76, name: "Golem", type: "Rock", baseHp: 165, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Kamenná lavina", type: "Rock", pwr: 66 }, { name: "Zemětřesení", type: "Rock", pwr: 62 }] },
+    { id: 77, name: "Ponyta", type: "Fire", baseHp: 75, baseAtk: 24, evolvesTo: 78, foodCost: 22, moves: [{ name: "Plamenné kopyto", type: "Fire", pwr: 32 }] },
+    { id: 78, name: "Rapidash", type: "Fire", baseHp: 150, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Ohnivý úprk", type: "Fire", pwr: 66 }] },
+    { id: 79, name: "Slowpoke", type: "Water", baseHp: 100, baseAtk: 18, evolvesTo: 80, foodCost: 22, moves: [{ name: "Vodní pistole", type: "Water", pwr: 28 }] },
+    { id: 80, name: "Slowbro", type: "Water", baseHp: 180, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Psychická vlna", type: "Psychic", pwr: 62 }] },
+    { id: 81, name: "Magnemite", type: "Electric", baseHp: 65, baseAtk: 25, evolvesTo: 82, foodCost: 22, moves: [{ name: "Jiskra", type: "Electric", pwr: 32 }] },
+    { id: 82, name: "Magneton", type: "Electric", baseHp: 140, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Elektrické dělo", type: "Electric", pwr: 66 }] },
+    { id: 83, name: "Farfetch'd", type: "Normal", baseHp: 90, baseAtk: 32, evolvesTo: null, foodCost: 0, moves: [{ name: "Sek pórkem", type: "Normal", pwr: 46 }] },
+    { id: 84, name: "Doduo", type: "Normal", baseHp: 70, baseAtk: 25, evolvesTo: 85, foodCost: 20, moves: [{ name: "Dvojité klovnutí", type: "Normal", pwr: 30 }] },
+    { id: 85, name: "Dodrio", type: "Normal", baseHp: 145, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Trojitý útok", type: "Normal", pwr: 64 }] },
+    { id: 86, name: "Seel", type: "Water", baseHp: 85, baseAtk: 20, evolvesTo: 87, foodCost: 22, moves: [{ name: "Ledový dech", type: "Water", pwr: 30 }] },
+    { id: 87, name: "Dewgong", type: "Water", baseHp: 165, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Polární záře", type: "Water", pwr: 62 }] },
+    { id: 88, name: "Grimer", type: "Ghost", baseHp: 90, baseAtk: 22, evolvesTo: 89, foodCost: 22, moves: [{ name: "Sliz", type: "Ghost", pwr: 30 }] },
+    { id: 89, name: "Muk", type: "Ghost", baseHp: 175, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Kyselá bomba", type: "Ghost", pwr: 64 }] },
+    { id: 90, name: "Shellder", type: "Water", baseHp: 70, baseAtk: 22, evolvesTo: 91, foodCost: 22, moves: [{ name: "Sevření", type: "Water", pwr: 30 }] },
+    { id: 91, name: "Cloyster", type: "Water", baseHp: 155, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Ledové kopí", type: "Water", pwr: 66 }] },
+    { id: 92, name: "Gastly", type: "Ghost", baseHp: 65, baseAtk: 26, evolvesTo: 94, foodCost: 30, moves: [{ name: "Stínová koule", type: "Ghost", pwr: 36 }] },
+    { id: 94, name: "Gengar", type: "Ghost", baseHp: 150, baseAtk: 54, evolvesTo: null, foodCost: 0, moves: [{ name: "Temný noční stín", type: "Ghost", pwr: 70 }, { name: "Noční můra", type: "Ghost", pwr: 62 }] },
+    { id: 95, name: "Onix", type: "Rock", baseHp: 120, baseAtk: 32, evolvesTo: null, foodCost: 0, moves: [{ name: "Kamenná hrobka", type: "Rock", pwr: 50 }] },
+    { id: 96, name: "Drowzee", type: "Psychic", baseHp: 80, baseAtk: 20, evolvesTo: 97, foodCost: 22, moves: [{ name: "Zmatení", type: "Psychic", pwr: 30 }] },
+    { id: 97, name: "Hypno", type: "Psychic", baseHp: 160, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Psychická pečeť", type: "Psychic", pwr: 62 }] },
+    { id: 98, name: "Krabby", type: "Water", baseHp: 70, baseAtk: 26, evolvesTo: 99, foodCost: 20, moves: [{ name: "Klepeta", type: "Water", pwr: 30 }] },
+    { id: 99, name: "Kingler", type: "Water", baseHp: 150, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Krabí kladivo", type: "Water", pwr: 68 }] },
+    { id: 100, name: "Voltorb", type: "Electric", baseHp: 65, baseAtk: 22, evolvesTo: 101, foodCost: 20, moves: [{ name: "Jiskření", type: "Electric", pwr: 28 }] },
+    { id: 101, name: "Electrode", type: "Electric", baseHp: 140, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Exploze blesku", type: "Electric", pwr: 64 }] },
+    { id: 102, name: "Exeggcute", type: "Grass", baseHp: 75, baseAtk: 20, evolvesTo: 103, foodCost: 22, moves: [{ name: "Hypnóza", type: "Grass", pwr: 28 }] },
+    { id: 103, name: "Exeggutor", type: "Grass", baseHp: 170, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Solární bomba", type: "Grass", pwr: 68 }] },
+    { id: 104, name: "Cubone", type: "Rock", baseHp: 75, baseAtk: 22, evolvesTo: 105, foodCost: 22, moves: [{ name: "Kostí úder", type: "Rock", pwr: 32 }] },
+    { id: 105, name: "Marowak", type: "Rock", baseHp: 150, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Kostní bumerang", type: "Rock", pwr: 64 }] },
+    { id: 106, name: "Hitmonlee", type: "Normal", baseHp: 140, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Skákavý kop", type: "Normal", pwr: 66 }] },
+    { id: 107, name: "Hitmonchan", type: "Normal", baseHp: 140, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Blesková pěst", type: "Normal", pwr: 64 }] },
+    { id: 108, name: "Lickitung", type: "Normal", baseHp: 150, baseAtk: 36, evolvesTo: null, foodCost: 0, moves: [{ name: "Lízavý útok", type: "Normal", pwr: 50 }] },
+    { id: 109, name: "Koffing", type: "Ghost", baseHp: 75, baseAtk: 22, evolvesTo: 110, foodCost: 22, moves: [{ name: "Kouř", type: "Ghost", pwr: 30 }] },
+    { id: 110, name: "Weezing", type: "Ghost", baseHp: 155, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Exploze", type: "Ghost", pwr: 66 }] },
+    { id: 111, name: "Rhyhorn", type: "Rock", baseHp: 90, baseAtk: 28, evolvesTo: 112, foodCost: 25, moves: [{ name: "Rohový drtič", type: "Rock", pwr: 35 }] },
+    { id: 112, name: "Rhydon", type: "Rock", baseHp: 180, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Vrták rohem", type: "Rock", pwr: 68 }] },
+    { id: 113, name: "Chansey", type: "Normal", baseHp: 240, baseAtk: 18, evolvesTo: null, foodCost: 0, moves: [{ name: "Vejcová bomba", type: "Normal", pwr: 48 }] },
+    { id: 114, name: "Tangela", type: "Grass", baseHp: 130, baseAtk: 36, evolvesTo: null, foodCost: 0, moves: [{ name: "Liánový uzel", type: "Grass", pwr: 54 }] },
+    { id: 115, name: "Kangaskhan", type: "Normal", baseHp: 175, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Drtivý dupot", type: "Normal", pwr: 64 }] },
+    { id: 116, name: "Horsea", type: "Water", baseHp: 65, baseAtk: 22, evolvesTo: 117, foodCost: 22, moves: [{ name: "Bubliny", type: "Water", pwr: 28 }] },
+    { id: 117, name: "Seadra", type: "Water", baseHp: 145, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Dračí dech", type: "Water", pwr: 62 }] },
+    { id: 118, name: "Goldeen", type: "Water", baseHp: 70, baseAtk: 22, evolvesTo: 119, foodCost: 20, moves: [{ name: "Rohový náraz", type: "Water", pwr: 28 }] },
+    { id: 119, name: "Seaking", type: "Water", baseHp: 145, baseAtk: 44, evolvesTo: null, foodCost: 0, moves: [{ name: "Vodopád", type: "Water", pwr: 60 }] },
+    { id: 120, name: "Staryu", type: "Water", baseHp: 65, baseAtk: 22, evolvesTo: 121, foodCost: 22, moves: [{ name: "Hvězdný svit", type: "Water", pwr: 30 }] },
+    { id: 121, name: "Starmie", type: "Water", baseHp: 150, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Hydro hvězda", type: "Water", pwr: 66 }] },
+    { id: 122, name: "Mr. Mime", type: "Psychic", baseHp: 135, baseAtk: 42, evolvesTo: null, foodCost: 0, moves: [{ name: "Bariéra", type: "Psychic", pwr: 56 }] },
+    { id: 123, name: "Scyther", type: "Grass", baseHp: 145, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Křížové čepele", type: "Grass", pwr: 68 }] },
+    { id: 124, name: "Jynx", type: "Water", baseHp: 135, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Mrazivý polibek", type: "Water", pwr: 62 }] },
+    { id: 125, name: "Electabuzz", type: "Electric", baseHp: 145, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Blesková rána", type: "Electric", pwr: 66 }] },
+    { id: 126, name: "Magmar", type: "Fire", baseHp: 145, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Lávový proud", type: "Fire", pwr: 66 }] },
+    { id: 127, name: "Pinsir", type: "Grass", baseHp: 145, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Gilotina kleští", type: "Grass", pwr: 68 }] },
+    { id: 128, name: "Tauros", type: "Normal", baseHp: 150, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Býčí útok", type: "Normal", pwr: 64 }] },
+    { id: 129, name: "Magikarp", type: "Water", baseHp: 50, baseAtk: 10, evolvesTo: 130, foodCost: 35, moves: [{ name: "Šplouchnutí", type: "Water", pwr: 15 }] },
+    { id: 130, name: "Gyarados", type: "Water", baseHp: 185, baseAtk: 56, evolvesTo: null, foodCost: 0, moves: [{ name: "Dračí hněv", type: "Dragon", pwr: 74 }, { name: "Hydro vír", type: "Water", pwr: 66 }] },
+    { id: 131, name: "Lapras", type: "Water", baseHp: 200, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Ledový zpěv", type: "Water", pwr: 64 }] },
+    { id: 132, name: "Ditto", type: "Normal", baseHp: 110, baseAtk: 30, evolvesTo: null, foodCost: 0, moves: [{ name: "Proměna", type: "Normal", pwr: 42 }] },
+    { id: 133, name: "Eevee", type: "Normal", baseHp: 75, baseAtk: 22, evolvesTo: 134, foodCost: 25, moves: [{ name: "Náraz", type: "Normal", pwr: 25 }] },
+    { id: 134, name: "Vaporeon", type: "Water", baseHp: 185, baseAtk: 48, evolvesTo: null, foodCost: 0, moves: [{ name: "Hydro dělo", type: "Water", pwr: 66 }] },
+    { id: 135, name: "Jolteon", type: "Electric", baseHp: 145, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Blesková smršť", type: "Electric", pwr: 68 }] },
+    { id: 136, name: "Flareon", type: "Fire", baseHp: 150, baseAtk: 54, evolvesTo: null, foodCost: 0, moves: [{ name: "Ohnivý záblesk", type: "Fire", pwr: 70 }] },
+    { id: 137, name: "Porygon", type: "Normal", baseHp: 130, baseAtk: 40, evolvesTo: null, foodCost: 0, moves: [{ name: "Konverze", type: "Normal", pwr: 54 }] },
+    { id: 138, name: "Omanyte", type: "Water", baseHp: 75, baseAtk: 24, evolvesTo: 139, foodCost: 25, moves: [{ name: "Vodní střela", type: "Water", pwr: 30 }] },
+    { id: 139, name: "Omastar", type: "Water", baseHp: 155, baseAtk: 50, evolvesTo: null, foodCost: 0, moves: [{ name: "Pravěký šok", type: "Water", pwr: 66 }] },
+    { id: 140, name: "Kabuto", type: "Rock", baseHp: 75, baseAtk: 24, evolvesTo: 141, foodCost: 25, moves: [{ name: "Škrábnutí", type: "Rock", pwr: 30 }] },
+    { id: 141, name: "Kabutops", type: "Rock", baseHp: 155, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Kamenné kosy", type: "Rock", pwr: 68 }] },
+    { id: 142, name: "Aerodactyl", type: "Rock", baseHp: 155, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Kamenný pád", type: "Rock", pwr: 66 }] },
+    { id: 143, name: "Snorlax", type: "Normal", baseHp: 230, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Tělesný zátah", type: "Normal", pwr: 70 }] },
+    { id: 147, name: "Dratini", type: "Dragon", baseHp: 75, baseAtk: 24, evolvesTo: 148, foodCost: 25, moves: [{ name: "Dračí dech", type: "Dragon", pwr: 34 }] },
+    { id: 148, name: "Dragonair", type: "Dragon", baseHp: 135, baseAtk: 38, evolvesTo: 149, foodCost: 45, moves: [{ name: "Dračí puls", type: "Dragon", pwr: 54 }] },
+    { id: 149, name: "Dragonite", type: "Dragon", baseHp: 195, baseAtk: 58, evolvesTo: null, foodCost: 0, moves: [{ name: "Dračí meteorit", type: "Dragon", pwr: 78 }, { name: "Blesk", type: "Electric", pwr: 60 }] },
+    { id: 152, name: "Chikorita", type: "Grass", baseHp: 80, baseAtk: 20, evolvesTo: 154, foodCost: 35, moves: [{ name: "Travní bič", type: "Grass", pwr: 30 }] },
+    { id: 154, name: "Meganium", type: "Grass", baseHp: 180, baseAtk: 46, evolvesTo: null, foodCost: 0, moves: [{ name: "Květinová bouře", type: "Grass", pwr: 66 }] },
+    { id: 155, name: "Cyndaquil", type: "Fire", baseHp: 75, baseAtk: 22, evolvesTo: 157, foodCost: 35, moves: [{ name: "Plamének", type: "Fire", pwr: 30 }] },
+    { id: 157, name: "Typhlosion", type: "Fire", baseHp: 180, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Lávový gejzír", type: "Fire", pwr: 70 }] },
+    { id: 158, name: "Totodile", type: "Water", baseHp: 85, baseAtk: 22, evolvesTo: 160, foodCost: 35, moves: [{ name: "Kousnutí", type: "Water", pwr: 30 }] },
+    { id: 160, name: "Feraligatr", type: "Water", baseHp: 185, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Hydro čelisti", type: "Water", pwr: 70 }] },
+    { id: 175, name: "Togepi", type: "Normal", baseHp: 70, baseAtk: 16, evolvesTo: null, foodCost: 0, moves: [{ name: "Metronom", type: "Normal", pwr: 38 }] },
+    { id: 179, name: "Mareep", type: "Electric", baseHp: 75, baseAtk: 20, evolvesTo: 181, foodCost: 30, moves: [{ name: "Blesková vlna", type: "Electric", pwr: 30 }] },
+    { id: 181, name: "Ampharos", type: "Electric", baseHp: 175, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Elektrický úder", type: "Electric", pwr: 70 }] },
+    { id: 246, name: "Larvitar", type: "Rock", baseHp: 80, baseAtk: 26, evolvesTo: 248, foodCost: 45, moves: [{ name: "Kousnutí", type: "Rock", pwr: 32 }] },
+    { id: 248, name: "Tyranitar", type: "Rock", baseHp: 195, baseAtk: 58, evolvesTo: null, foodCost: 0, moves: [{ name: "Písečná hrobka", type: "Rock", pwr: 76 }] },
+    { id: 252, name: "Treecko", type: "Grass", baseHp: 75, baseAtk: 22, evolvesTo: 254, foodCost: 35, moves: [{ name: "Absorpce", type: "Grass", pwr: 28 }] },
+    { id: 254, name: "Sceptile", type: "Grass", baseHp: 175, baseAtk: 52, evolvesTo: null, foodCost: 0, moves: [{ name: "Listová čepel", type: "Grass", pwr: 70 }] },
+    { id: 255, name: "Torchic", type: "Fire", baseHp: 75, baseAtk: 24, evolvesTo: 257, foodCost: 35, moves: [{ name: "Uhlíky", type: "Fire", pwr: 30 }] },
+    { id: 257, name: "Blaziken", type: "Fire", baseHp: 180, baseAtk: 56, evolvesTo: null, foodCost: 0, moves: [{ name: "Ohnivý kop", type: "Fire", pwr: 74 }] },
+    { id: 258, name: "Mudkip", type: "Water", baseHp: 80, baseAtk: 22, evolvesTo: 260, foodCost: 35, moves: [{ name: "Vodní střela", type: "Water", pwr: 30 }] },
+    { id: 260, name: "Swampert", type: "Water", baseHp: 190, baseAtk: 54, evolvesTo: null, foodCost: 0, moves: [{ name: "Bahnitá vlna", type: "Water", pwr: 70 }] },
+    { id: 282, name: "Gardevoir", type: "Psychic", baseHp: 165, baseAtk: 54, evolvesTo: null, foodCost: 0, moves: [{ name: "Měsíční záblesk", type: "Psychic", pwr: 74 }] },
+    { id: 373, name: "Salamence", type: "Dragon", baseHp: 190, baseAtk: 58, evolvesTo: null, foodCost: 0, moves: [{ name: "Dračí dráp", type: "Dragon", pwr: 76 }] },
+    { id: 376, name: "Metagross", type: "Psychic", baseHp: 185, baseAtk: 56, evolvesTo: null, foodCost: 0, moves: [{ name: "Meteorický úder", type: "Psychic", pwr: 76 }] }
+];
+
+/* 18 LEGENDÁRNÍCH BOSSŮ */
+const BOSS_DATABASE = [
+    { id: 150, name: "Mewtwo", type: "Psychic", hp: 4800, skill: "Psychické Zničení", pwr: 80, cp: 11500, weakness: "Ghost / Bug" },
+    { id: 151, name: "Mew", type: "Psychic", hp: 4200, skill: "Kosmická Síla", pwr: 74, cp: 10200, weakness: "Ghost / Bug" },
+    { id: 249, name: "Lugia", type: "Psychic", hp: 5200, skill: "Aeroblast", pwr: 82, cp: 12200, weakness: "Electric / Rock" },
+    { id: 250, name: "Ho-Oh", type: "Fire", hp: 5200, skill: "Posvátný Oheň", pwr: 84, cp: 12400, weakness: "Water / Rock" },
+    { id: 384, name: "Rayquaza", type: "Dragon", hp: 5600, skill: "Dračí Výstup", pwr: 88, cp: 13500, weakness: "Dragon / Rock" },
+    { id: 382, name: "Kyogre", type: "Water", hp: 5400, skill: "Počátek Přílivu", pwr: 85, cp: 12900, weakness: "Electric / Grass" },
+    { id: 383, name: "Groudon", type: "Rock", hp: 5400, skill: "Zemětřesná Čepel", pwr: 85, cp: 12900, weakness: "Water / Grass" },
+    { id: 386, name: "Deoxys", type: "Psychic", hp: 4600, skill: "Psycho Posun", pwr: 88, cp: 12100, weakness: "Ghost" },
+    { id: 483, name: "Dialga", type: "Dragon", hp: 5800, skill: "Hukot Času", pwr: 90, cp: 13800, weakness: "Dragon" },
+    { id: 484, name: "Palkia", type: "Dragon", hp: 5800, skill: "Prostorová Trhlina", pwr: 90, cp: 13800, weakness: "Dragon" },
+    { id: 487, name: "Giratina", type: "Ghost", hp: 6000, skill: "Stínová Síla", pwr: 88, cp: 14200, weakness: "Ghost / Dragon" },
+    { id: 493, name: "Arceus", type: "Normal", hp: 6500, skill: "Soudný Den", pwr: 95, cp: 15500, weakness: "Všechny živly" },
+    { id: 144, name: "Articuno", type: "Water", hp: 4400, skill: "Ledový Zmrazovač", pwr: 75, cp: 10500, weakness: "Fire / Electric" },
+    { id: 145, name: "Zapdos", type: "Electric", hp: 4500, skill: "Hromové Dělo", pwr: 78, cp: 10800, weakness: "Rock" },
+    { id: 146, name: "Moltres", type: "Fire", hp: 4500, skill: "Ohnivý Pád", pwr: 78, cp: 10800, weakness: "Water / Rock" },
+    { id: 243, name: "Raikou", type: "Electric", hp: 4600, skill: "Bleskový Řev", pwr: 78, cp: 11000, weakness: "Rock" },
+    { id: 244, name: "Entei", type: "Fire", hp: 4700, skill: "Vulkánický Řev", pwr: 80, cp: 11200, weakness: "Water / Rock" },
+    { id: 245, name: "Suicune", type: "Water", hp: 4800, skill: "Polární Polibek", pwr: 78, cp: 11300, weakness: "Electric / Grass" }
+];
+
+/* ==========================================================================
+   4. STATY, EXPY A ZÓNY
+   ========================================================================== */
+function getExpRequiredForLevel(lvl) {
+    return Math.floor(1.35 * Math.pow(lvl, 2.75)) + 25;
+}
+
+function calculateCurrentStats(poke) {
+    const lvl = poke.level || 1;
+    const starMult = 1.0 + ((poke.stars || 1) - 1) * 0.10;
+    const hp = Math.floor((poke.baseHp * 1.2 + lvl * 14) * starMult);
+    const atk = Math.floor((poke.baseAtk + lvl * 2.8) * starMult);
+    const def = Math.floor((20 + lvl * 2.2) * starMult);
+    const cp = Math.floor((hp * 1.4) + (atk * 3.5) + (def * 2.0));
+    return { hp, atk, def, cp };
+}
+
+function getStarDisplay(stars) {
+    return '⭐'.repeat(Math.max(1, Math.min(4, stars || 1)));
+}
+
+const ZONES = [
+    { id: 1, name: "Smaragdové Louky", minLvl: 1, maxLvl: 10, icon: "🌿", bg: "#064e3b", pool: [1, 4, 7, 10, 13, 16, 19, 21, 23, 25, 29, 32, 43, 69] },
+    { id: 2, name: "Šeptající Hvozd", minLvl: 10, maxLvl: 20, icon: "🌲", bg: "#022c22", pool: [2, 11, 14, 17, 20, 22, 24, 27, 35, 39, 41, 52, 114, 152] },
+    { id: 3, name: "Tyrkysové Pobřeží", minLvl: 20, maxLvl: 35, icon: "🌊", bg: "#075985", pool: [8, 54, 60, 72, 79, 86, 90, 98, 116, 118, 120, 129, 158] },
+    { id: 4, name: "Sopečné Hory", minLvl: 35, maxLvl: 50, icon: "🌋", bg: "#7f1d1d", pool: [5, 28, 37, 38, 58, 74, 77, 95, 104, 111, 126, 142, 155] },
+    { id: 5, name: "Temný Dungeon", minLvl: 50, maxLvl: 70, icon: "🗝️", bg: "#312e81", pool: [42, 88, 92, 94, 96, 109, 66, 68, 81, 82, 106, 107] },
+    { id: 6, name: "Dračí Vysočina", minLvl: 70, maxLvl: 85, icon: "🐉", bg: "#4c1d95", pool: [147, 148, 133, 134, 135, 136, 181, 246, 252, 255, 258, 282] },
+    { id: 7, name: "Šampiónský Vrchol", minLvl: 85, maxLvl: 100, icon: "👑", bg: "#1e1b4b", pool: [3, 6, 9, 26, 130, 143, 149, 154, 157, 160, 248, 373, 376] },
+    { id: 99, name: "Gold Pokémon Miner 🪙", minLvl: 10, maxLvl: 70, icon: "⛏️", bg: "#78350f", isGoldMiner: true, pool: [50, 51, 52, 53, 74, 81, 100, 104, 111] }
+];
+
+/* ==========================================================================
+   5. HRÁČ & UKLÁDÁNÍ
+   ========================================================================== */
+const STORAGE_KEY = "POKEMON_LEGENDARY_SAVE_DATA_V2";
+
+let player = {
+    name: "Ash",
+    skin: 0,
+    gold: 50,
+    food: 6,
+    bossTickets: 1,
+    currentZoneId: 1,
+    team: [],
+    pokedex: {},
+    lastBossBattleTime: 0,
+    bossDefeatedCount: 0,
+    x: 1000,
+    y: 1000
+};
+
+const SKINS = ["🧢", "👒", "🥷", "👑"];
+
+function initDex() {
+    POKEMON_DATABASE.forEach(p => {
+        if (!player.pokedex[p.id]) {
+            player.pokedex[p.id] = { seen: false, caught: false };
+        }
+    });
+    BOSS_DATABASE.forEach(b => {
+        if (!player.pokedex[b.id]) {
+            player.pokedex[b.id] = { seen: false, caught: false };
+        }
+    });
+}
+
+function saveGameToDisk() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(player));
+        showToast("💾 Hra uložena do paměti!");
+    } catch(e) {}
+}
+
+function loadGameFromDisk() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            Object.assign(player, JSON.parse(raw));
+            if (player.bossDefeatedCount === undefined) player.bossDefeatedCount = 0;
+            initDex();
+            updateTopBar();
+            return true;
+        }
+    } catch(e) {}
+    return false;
+}
+
+function showToast(msg) {
+    const banner = document.getElementById("toast-banner");
+    banner.innerText = msg;
+    banner.classList.remove("hidden");
+    banner.style.opacity = "1";
+    setTimeout(() => {
+        banner.style.opacity = "0";
+        setTimeout(() => banner.classList.add("hidden"), 300);
+    }, 2800);
+}
+
+function updateTopBar() {
+    document.getElementById("val-currency-gold").innerText = player.gold;
+    document.getElementById("val-currency-food").innerText = player.food;
+    document.getElementById("val-currency-tickets").innerText = player.bossTickets;
+    document.getElementById("shop-gold-display").innerText = player.gold;
+    document.getElementById("team-berries-val").innerText = player.food;
+
+    const z = ZONES.find(item => item.id === player.currentZoneId) || ZONES[0];
+    document.getElementById("zone-badge-icon").innerText = z.icon;
+    document.getElementById("zone-badge-name").innerText = z.name;
+    document.getElementById("zone-badge-name").className = z.isGoldMiner ? "text-amber-400 font-bold" : "text-emerald-300";
+}
+
+/* ==========================================================================
+   6. MAPA & 75 POKÉMONŮ V ZÓNĚ
+   ========================================================================== */
+const TILE_SIZE = 32;
+const MAP_COLS = 100;
+const MAP_ROWS = 100;
+const WORLD_W = MAP_COLS * TILE_SIZE;
+const WORLD_H = MAP_ROWS * TILE_SIZE;
+
+let overworldGrid = [];
+let wildEntities = [];
+
+function generateZoneTerrain() {
+    overworldGrid = new Array(MAP_ROWS);
+    const zone = ZONES.find(z => z.id === player.currentZoneId) || ZONES[0];
+
+    for (let r = 0; r < MAP_ROWS; r++) {
+        overworldGrid[r] = new Uint8Array(MAP_COLS);
+        for (let c = 0; c < MAP_COLS; c++) {
+            if (zone.isGoldMiner) {
+                overworldGrid[r][c] = (Math.random() < 0.15) ? 9 : 8;
+            } else if (zone.id === 3) {
+                overworldGrid[r][c] = (Math.random() < 0.3) ? 2 : 1;
+            } else if (zone.id === 4) {
+                overworldGrid[r][c] = (Math.random() < 0.18) ? 5 : 4;
+            } else if (zone.id === 5) {
+                overworldGrid[r][c] = (Math.random() < 0.22) ? 7 : 6;
+            } else {
+                overworldGrid[r][c] = (Math.random() < 0.25) ? 1 : 0;
+            }
+        }
+    }
+
+    wildEntities = [];
+    for (let i = 0; i < 75; i++) {
+        spawnWildInCurrentZone();
+    }
+}
+
+function spawnWildInCurrentZone() {
+    const zone = ZONES.find(z => z.id === player.currentZoneId) || ZONES[0];
+    const id = zone.pool[Math.floor(Math.random() * zone.pool.length)];
+    const template = POKEMON_DATABASE.find(p => p.id === id);
+    if (!template) return;
+
+    const starRoll = Math.random();
+    let stars = 1;
+    if (starRoll > 0.88) stars = 4;
+    else if (starRoll > 0.60) stars = 3;
+    else if (starRoll > 0.25) stars = 2;
+
+    const lvl = Math.floor(Math.random() * (zone.maxLvl - zone.minLvl + 1)) + zone.minLvl;
+
+    const img = new Image();
+    img.src = getSpriteUrl(template.id);
+
+    wildEntities.push({
+        id: template.id,
+        name: template.name,
+        type: template.type,
+        level: lvl,
+        stars: stars,
+        baseHp: template.baseHp,
+        baseAtk: template.baseAtk,
+        moves: template.moves,
+        isGoldMiner: zone.isGoldMiner,
+        x: Math.floor(Math.random() * (WORLD_W - 200)) + 100,
+        y: Math.floor(Math.random() * (WORLD_H - 200)) + 100,
+        vx: 0, vy: 0,
+        timer: Math.random() * 90,
+        img: img
+    });
+}
+
+function updateWildEntities() {
+    wildEntities.forEach(w => {
+        w.timer--;
+        if (w.timer <= 0) {
+            w.timer = 80 + Math.random() * 100;
+            if (Math.random() < 0.6) {
+                const a = Math.random() * Math.PI * 2;
+                w.vx = Math.cos(a) * 0.7;
+                w.vy = Math.sin(a) * 0.7;
+            } else {
+                w.vx = 0; w.vy = 0;
+            }
+        }
+        w.x = Math.max(60, Math.min(WORLD_W - 60, w.x + w.vx));
+        w.y = Math.max(60, Math.min(WORLD_H - 60, w.y + w.vy));
+    });
+
+    if (wildEntities.length < 75 && Math.random() < 0.15) spawnWildInCurrentZone();
+}
+
+/* ==========================================================================
+   7. CANVAS RENDER SVĚTA
+   ========================================================================== */
+const worldCanvas = document.getElementById("overworldCanvas");
+const worldCtx = worldCanvas.getContext("2d");
+
+function resizeWorldCanvas() {
+    worldCanvas.width = worldCanvas.clientWidth;
+    worldCanvas.height = worldCanvas.clientHeight;
+}
+window.addEventListener("resize", resizeWorldCanvas);
+
+const cam = { x: 0, y: 0 };
+const ZOOM = 1.8;
+
+function drawOverworld() {
+    worldCtx.clearRect(0, 0, worldCanvas.width, worldCanvas.height);
+    worldCtx.save();
+    worldCtx.scale(ZOOM, ZOOM);
+
+    const viewW = worldCanvas.width / ZOOM;
+    const viewH = worldCanvas.height / ZOOM;
+
+    cam.x = Math.max(0, Math.min(WORLD_W - viewW, player.x - viewW / 2));
+    cam.y = Math.max(0, Math.min(WORLD_H - viewH, player.y - viewH / 2));
+
+    const sCol = Math.max(0, Math.floor(cam.x / TILE_SIZE));
+    const eCol = Math.min(MAP_COLS, Math.ceil((cam.x + viewW) / TILE_SIZE));
+    const sRow = Math.max(0, Math.floor(cam.y / TILE_SIZE));
+    const eRow = Math.min(MAP_ROWS, Math.ceil((cam.y + viewH) / TILE_SIZE));
+
+    for (let r = sRow; r < eRow; r++) {
+        for (let c = sCol; c < eCol; c++) {
+            const tile = overworldGrid[r][c];
+            const sx = Math.floor(c * TILE_SIZE - cam.x);
+            const sy = Math.floor(r * TILE_SIZE - cam.y);
+
+            switch (tile) {
+                case 0: worldCtx.fillStyle = "#10b981"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 1: worldCtx.fillStyle = "#047857"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 2: worldCtx.fillStyle = "#0284c7"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 4: worldCtx.fillStyle = "#57534e"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 5: worldCtx.fillStyle = "#dc2626"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 6: worldCtx.fillStyle = "#1e1b4b"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 7: worldCtx.fillStyle = "#312e81"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 8: worldCtx.fillStyle = "#451a03"; worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE); break;
+                case 9:
+                    worldCtx.fillStyle = "#78350f";
+                    worldCtx.fillRect(sx, sy, TILE_SIZE, TILE_SIZE);
+                    worldCtx.fillStyle = "#facc15";
+                    worldCtx.fillRect(sx + 10, sy + 10, 12, 12);
+                    break;
+            }
+        }
+    }
+
+    wildEntities.forEach(w => {
+        const sx = w.x - cam.x;
+        const sy = w.y - cam.y;
+        if (sx > -40 && sx < viewW + 40 && sy > -40 && sy < viewH + 40) {
+            worldCtx.fillStyle = "rgba(0,0,0,0.35)";
+            worldCtx.beginPath();
+            worldCtx.ellipse(sx, sy + 12, 14, 6, 0, 0, Math.PI * 2);
+            worldCtx.fill();
+
+            if (w.img && w.img.complete) {
+                worldCtx.drawImage(w.img, sx - 24, sy - 26, 48, 48);
+            }
+
+            worldCtx.font = "8px 'Press Start 2P'";
+            worldCtx.textAlign = "center";
+            worldCtx.fillStyle = w.isGoldMiner ? "#fef08a" : "#ffffff";
+            worldCtx.strokeStyle = "#000000";
+            worldCtx.lineWidth = 2;
+            const elemIcon = ELEMENT_ICONS[w.type] || "⭐";
+            const title = `Lv${w.level} ${w.name} ${elemIcon}`;
+            worldCtx.strokeText(title, sx, sy - 30);
+            worldCtx.fillText(title, sx, sy - 30);
+        }
+    });
+
+    const px = player.x - cam.x;
+    const py = player.y - cam.y;
+
+    worldCtx.fillStyle = "rgba(0,0,0,0.4)";
+    worldCtx.beginPath();
+    worldCtx.ellipse(px, py + 12, 14, 6, 0, 0, Math.PI * 2);
+    worldCtx.fill();
+
+    worldCtx.font = "28px sans-serif";
+    worldCtx.textAlign = "center";
+    worldCtx.textBaseline = "middle";
+    worldCtx.fillText(SKINS[player.skin] || "🧢", px, py - 4);
+
+    const leadMon = player.team[0];
+    const trainerTag = `${player.name} [Lv.${leadMon ? leadMon.level : 1}]`;
+
+    worldCtx.font = "8px 'Press Start 2P'";
+    worldCtx.fillStyle = "#facc15";
+    worldCtx.strokeStyle = "#000000";
+    worldCtx.lineWidth = 2;
+    worldCtx.strokeText(trainerTag, px, py - 26);
+    worldCtx.fillText(trainerTag, px, py - 26);
+
+    if (leadMon) {
+        const fImg = new Image();
+        fImg.src = getSpriteUrl(leadMon.id);
+        if (fImg.complete) {
+            worldCtx.drawImage(fImg, px - 38, py - 16, 32, 32);
+        }
+    }
+
+    worldCtx.restore();
+}
+
+/* ==========================================================================
+   8. VSTUP & OVLÁDÁNÍ
+   ========================================================================== */
+const activeKeys = {};
+window.addEventListener("keydown", (e) => {
+    sfx.init();
+    activeKeys[e.key.toLowerCase()] = true;
+    if (e.key === " " || e.key === "Enter" || e.key.toLowerCase() === "e") checkAndTriggerEncounter();
+    if (e.key.toLowerCase() === "m") openMapModal();
+});
+window.addEventListener("keyup", (e) => { activeKeys[e.key.toLowerCase()] = false; });
+
+const joyZone = document.getElementById("virtual-joystick-zone");
+const joyKnob = document.getElementById("virtual-joystick-knob");
+let joyActive = false;
+let joyVec = { x: 0, y: 0 };
+let joyCenter = { x: 0, y: 0 };
+const maxRadius = 42;
+
+joyZone.addEventListener("touchstart", (e) => {
+    sfx.init();
+    joyActive = true;
+    const r = joyZone.getBoundingClientRect();
+    joyCenter = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    handleJoy(e.touches[0]);
+}, { passive: false });
+
+joyZone.addEventListener("touchmove", (e) => {
+    if (!joyActive) return;
+    e.preventDefault();
+    handleJoy(e.touches[0]);
+}, { passive: false });
+
+function resetJoy() {
+    joyActive = false;
+    joyVec = { x: 0, y: 0 };
+    joyKnob.style.transform = `translate(0px, 0px)`;
+}
+joyZone.addEventListener("touchend", resetJoy);
+joyZone.addEventListener("touchcancel", resetJoy);
+
+function handleJoy(t) {
+    const dx = t.clientX - joyCenter.x;
+    const dy = t.clientY - joyCenter.y;
+    const d = Math.hypot(dx, dy);
+    if (d === 0) return;
+
+    const angle = Math.atan2(dy, dx);
+    const cap = Math.min(d, maxRadius);
+    const sx = Math.cos(angle) * cap;
+    const sy = Math.sin(angle) * cap;
+
+    joyKnob.style.transform = `translate(${sx}px, ${sy}px)`;
+    joyVec = { x: sx / maxRadius, y: sy / maxRadius };
+}
+
+function processPlayerMovement() {
+    let dx = 0, dy = 0;
+    if (activeKeys["w"] || activeKeys["arrowup"]) dy -= 1;
+    if (activeKeys["s"] || activeKeys["arrowdown"]) dy += 1;
+    if (activeKeys["a"] || activeKeys["arrowleft"]) dx -= 1;
+    if (activeKeys["d"] || activeKeys["arrowright"]) dx += 1;
+
+    if (joyActive) { dx += joyVec.x; dy += joyVec.y; }
+
+    const mag = Math.hypot(dx, dy);
+    if (mag > 0) {
+        const speed = 3.8;
+        player.x = Math.max(40, Math.min(WORLD_W - 40, player.x + (dx / (mag > 1 ? mag : 1)) * speed));
+        player.y = Math.max(40, Math.min(WORLD_H - 40, player.y + (dy / (mag > 1 ? mag : 1)) * speed));
+    }
+}
+
+let closeWildIndex = -1;
+function checkWildProximity() {
+    closeWildIndex = -1;
+    for (let i = 0; i < wildEntities.length; i++) {
+        if (Math.hypot(player.x - wildEntities[i].x, player.y - wildEntities[i].y) < 45) {
+            closeWildIndex = i;
+            break;
+        }
+    }
+    const prompt = document.getElementById("overworld-prompt");
+    if (closeWildIndex !== -1) {
+        const target = wildEntities[closeWildIndex];
+        prompt.classList.remove("hidden");
+        prompt.innerText = target.isGoldMiner ? `[MEZERNÍK / A] Důl na zlaťáky s ${target.name}!` : `[MEZERNÍK / A] Souboj s ${target.name}!`;
+    } else {
+        prompt.classList.add("hidden");
+    }
+}
+
+function checkAndTriggerEncounter() {
+    if (closeWildIndex !== -1) startCombatWithWild(closeWildIndex);
+}
+
+/* ==========================================================================
+   9. VIZUÁLNÍ EFEKTY ČÁSTIC
+   ========================================================================== */
+const combatFxCanvas = document.getElementById("combatFxCanvas");
+const fxCtx = combatFxCanvas.getContext("2d");
+let combatParticles = [];
+
+function resizeCombatFx() {
+    const p = document.getElementById("combat-stage-box");
+    if (p) {
+        combatFxCanvas.width = p.clientWidth;
+        combatFxCanvas.height = p.clientHeight;
+    }
+}
+
+function triggerSkillVFX(type, isEnemyTarget) {
+    resizeCombatFx();
+    const w = combatFxCanvas.width;
+    const h = combatFxCanvas.height;
+    const targetX = isEnemyTarget ? w * 0.75 : w * 0.25;
+    const targetY = isEnemyTarget ? h * 0.35 : h * 0.65;
+    const startX = isEnemyTarget ? w * 0.25 : w * 0.75;
+    const startY = isEnemyTarget ? h * 0.65 : h * 0.35;
+
+    for (let i = 0; i < 35; i++) {
+        combatParticles.push({
+            x: startX, y: startY,
+            vx: (targetX - startX) / 16 + (Math.random() - 0.5) * 8,
+            vy: (targetY - startY) / 16 + (Math.random() - 0.5) * 8,
+            size: 6 + Math.random() * 8,
+            color: type === "Fire" ? "#ef4444" : (type === "Water" ? "#0284c7" : (type === "Electric" ? "#facc15" : (type === "Grass" ? "#22c55e" : "#a855f7"))),
+            life: 25, maxLife: 25
+        });
+    }
+}
+
+function updateAndRenderVFX() {
+    fxCtx.clearRect(0, 0, combatFxCanvas.width, combatFxCanvas.height);
+    for (let i = combatParticles.length - 1; i >= 0; i--) {
+        const p = combatParticles[i];
+        p.x += p.vx; p.y += p.vy; p.life--;
+        const alpha = p.life / p.maxLife;
+        fxCtx.fillStyle = p.color;
+        fxCtx.globalAlpha = alpha;
+        fxCtx.beginPath();
+        fxCtx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+        fxCtx.fill();
+        if (p.life <= 0) combatParticles.splice(i, 1);
+    }
+    fxCtx.globalAlpha = 1;
+}
+
+/* ==========================================================================
+   10. BOJOVÝ ENGINE & REBALANCOVANÝ VÝPOČET POŠKOZENÍ
+   ========================================================================== */
+let combat = {
+    active: false,
+    mode: "wild",
+    wildIdx: -1,
+    turn: "player",
+    playerPokemon: null,
+    playerPokemonIndex: 0,
+    enemyPokemon: null,
+    isThrowingBall: false,
+    catchesLeft: 3,
+    bossRaidTeam: [],
+    bossRaidIndex: 0
+};
+
+function startCombatWithWild(wildIdx) {
+    const w = wildEntities[wildIdx];
+    if (!w || player.team.length === 0) return;
+
+    player.team.forEach(p => { 
+        const s = calculateCurrentStats(p);
+        p.maxHp = s.hp;
+        p.hp = s.hp;
+    });
+
+    combat.active = true;
+    combat.mode = "wild";
+    combat.wildIdx = wildIdx;
+    combat.isThrowingBall = false;
+    combat.catchesLeft = 3;
+    combat.playerPokemonIndex = 0;
+
+    combat.playerPokemon = player.team[0];
+    const pStats = calculateCurrentStats(combat.playerPokemon);
+    combat.playerPokemon.maxHp = pStats.hp;
+    combat.playerPokemon.hp = pStats.hp;
+    combat.playerPokemon.atk = pStats.atk;
+    combat.playerPokemon.def = pStats.def;
+
+    const eStats = calculateCurrentStats(w);
+
+    combat.enemyPokemon = {
+        id: w.id, name: w.name, type: w.type, level: w.level, stars: w.stars,
+        isGoldMiner: w.isGoldMiner, maxHp: eStats.hp, hp: eStats.hp, atk: eStats.atk, def: eStats.def,
+        moves: w.moves, img: getSpriteUrl(w.id)
+    };
+
+    player.pokedex[w.id].seen = true;
+
+    document.getElementById("screen-combat-arena").classList.remove("hidden");
+    document.getElementById("combat-mode-badge").innerText = w.isGoldMiner ? "GOLD MINER 🪙" : "DIVOKÝ SOUBOJ";
+    document.getElementById("flying-pokeball").classList.add("hidden");
+    document.getElementById("ball-graphic").innerText = "🔴";
+    document.getElementById("enemy-sprite-img").style.opacity = "1";
+
+    combat.turn = "player";
+    renderCombatInterface();
+    setCombatLog(`Divoký ${w.name} (${getStarDisplay(w.stars)}) se objevil! Oslab ho pod 50 % HP a chyť ho!`);
+}
+
+function renderCombatInterface() {
+    const p = combat.playerPokemon;
+    const e = combat.enemyPokemon;
+
+    document.getElementById("player-display-name").innerText = p.name;
+    document.getElementById("player-display-lvl").innerText = p.level;
+    document.getElementById("player-display-stars").innerText = getStarDisplay(p.stars);
+    document.getElementById("player-sprite-img").src = getSpriteUrl(p.id);
+    document.getElementById("player-elem-icon").innerText = ELEMENT_ICONS[p.type] || "⭐";
+
+    const pPct = Math.max(0, Math.min(100, (p.hp / p.maxHp) * 100));
+    const pHpFill = document.getElementById("player-hp-fill");
+    pHpFill.style.width = `${pPct}%`;
+    pHpFill.className = pPct < 25 ? "bg-red-500 h-full" : (pPct < 50 ? "bg-yellow-500 h-full" : "bg-green-500 h-full");
+    document.getElementById("player-hp-num").innerText = `${Math.ceil(p.hp)}/${p.maxHp}`;
+
+    const expReq = getExpRequiredForLevel(p.level);
+    const expPct = Math.min(100, Math.floor(((p.exp || 0) / expReq) * 100));
+    document.getElementById("player-exp-fill").style.width = `${expPct}%`;
+    document.getElementById("player-exp-num").innerText = `${expPct}%`;
+
+    document.getElementById("enemy-display-name").innerText = e.name;
+    document.getElementById("enemy-display-lvl").innerText = e.level;
+    document.getElementById("enemy-display-stars").innerText = getStarDisplay(e.stars);
+    document.getElementById("enemy-sprite-img").src = e.img;
+    document.getElementById("enemy-elem-icon").innerText = ELEMENT_ICONS[e.type] || "⭐";
+
+    const ePct = Math.max(0, Math.min(100, (e.hp / e.maxHp) * 100));
+    const eHpFill = document.getElementById("enemy-hp-fill");
+    eHpFill.style.width = `${ePct}%`;
+    eHpFill.className = ePct < 25 ? "bg-red-500 h-full" : (ePct < 50 ? "bg-yellow-500 h-full" : "bg-green-500 h-full");
+    document.getElementById("enemy-hp-num").innerText = `${Math.ceil(e.hp)}/${e.maxHp}`;
+
+    const actionBox = document.getElementById("combat-actions-grid");
+    actionBox.innerHTML = "";
+
+    // Speciální stav: BOSS JE PORAŽEN A ČEKÁ NA CHYCENÍ SYNEM
+    if (combat.mode === "boss_raid" && e.hp <= 0 && !combat.isThrowingBall) {
+        const catchBossBtn = document.createElement("button");
+        catchBossBtn.className = "col-span-2 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:from-purple-500 border-2 border-yellow-300 p-3 rounded-xl text-center font-extrabold text-yellow-200 text-[10px] shadow-2xl cursor-pointer active:scale-95 animate-pulse";
+        catchBossBtn.innerHTML = `👑 HODIT MASTER BALL NA BOSSE! 🟣`;
+        catchBossBtn.onclick = throwBossCatchBall;
+        actionBox.appendChild(catchBossBtn);
+        return;
+    }
+
+    if (combat.turn === "player" && !combat.isThrowingBall) {
+        p.moves.forEach(m => {
+            const btn = document.createElement("button");
+            const mult = getElementMultiplier(m.type, e.type);
+            const badge = mult > 1.0 ? "💥 SUPER EFEKTIVNÍ!" : (mult < 1.0 && mult > 0 ? "🛡️ MÁLO ÚČINNÉ" : (mult === 0 ? "❌ BEZ ÚČINKU" : ""));
+            btn.className = "bg-gray-800 hover:bg-gray-700 active:scale-95 border-2 border-yellow-500 p-2 rounded-xl text-left text-[8px] flex flex-col justify-between cursor-pointer";
+            btn.innerHTML = `
+                <div class="font-bold text-white flex justify-between">
+                    <span>${m.name}</span>
+                    <span>${ELEMENT_ICONS[m.type] || "⭐"}</span>
+                </div>
+                <span class="text-[7px] text-yellow-300 mt-1">${m.type} • SÍLA ${m.pwr} ${badge ? '<br><span class="text-amber-400 font-bold">' + badge + '</span>' : ''}</span>
+            `;
+            btn.onclick = () => doPlayerCombatAttack(m);
+            actionBox.appendChild(btn);
+        });
+
+        // Tlačítko pro výměnu Pokémona (pouze v běžných soubojích a v aréně, NIKOLIV v BOSS raidu)
+        if (combat.mode !== "boss_raid" && player.team.length > 1) {
+            const switchBtn = document.createElement("button");
+            switchBtn.className = "bg-indigo-900 hover:bg-indigo-800 active:scale-95 border-2 border-cyan-400 p-2 rounded-xl text-center text-[8px] font-bold text-cyan-200 flex items-center justify-center space-x-1 cursor-pointer";
+            switchBtn.innerHTML = `<span>🔄</span><span>VYMĚNIT</span>`;
+            switchBtn.onclick = openCombatSwitchModal;
+            actionBox.appendChild(switchBtn);
+        }
+
+        if (combat.mode === "wild" && !e.isGoldMiner) {
+            const catchBtn = document.createElement("button");
+            const canCatch = (e.hp / e.maxHp) <= 0.50;
+            const isFullSpan = (player.team.length <= 1);
+
+            if (canCatch) {
+                catchBtn.className = `${isFullSpan ? 'col-span-2' : ''} bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 border-2 border-white p-2 rounded-xl text-center font-bold text-yellow-300 text-[9px] shadow-lg cursor-pointer active:scale-95`;
+                catchBtn.innerHTML = `🔴 CHYTIT (${combat.catchesLeft}/3)`;
+                catchBtn.onclick = throwPokeball;
+            } else {
+                catchBtn.className = `${isFullSpan ? 'col-span-2' : ''} bg-gray-800 border-2 border-gray-600 p-2 rounded-xl text-center font-bold text-gray-500 text-[9px] shadow-lg cursor-not-allowed opacity-60`;
+                catchBtn.innerHTML = `🔒 CHYTIT (<50%)`;
+                catchBtn.onclick = () => {
+                    sfx.defeat();
+                    setCombatLog(`⚠️ POKÉMON JE MOC ČILÝ! Oslab ho pod 50 % HP, jinak míček odrazí!`);
+                };
+            }
+            actionBox.appendChild(catchBtn);
+        }
+    } else {
+        const wait = document.createElement("div");
+        wait.className = "col-span-2 bg-gray-900 border border-gray-700 p-3 rounded-xl text-center text-[8px] text-gray-400";
+        wait.innerText = combat.isThrowingBall ? "Pokéball letí vzduchem..." : "Čekej na tah soupeře...";
+        actionBox.appendChild(wait);
+    }
+}
+
+function setCombatLog(msg) {
+    document.getElementById("combat-log-text").innerText = msg;
+}
+
+/* ==========================================================================
+   VÝMĚNA POKÉMONA BĚHEM SOUBOJE (BĚŽNÉ BOJE + ARÉNA)
+   ========================================================================== */
+function openCombatSwitchModal() {
+    if (combat.turn !== "player" || combat.mode === "boss_raid") return;
+
+    const list = document.getElementById("combat-switch-list");
+    list.innerHTML = "";
+
+    player.team.forEach((p, idx) => {
+        const stats = calculateCurrentStats(p);
+        const maxHp = p.maxHp || stats.hp;
+        const currentHp = (p.hp !== undefined) ? p.hp : maxHp;
+        const isCurrentActive = (combat.playerPokemonIndex === idx);
+        const isFainted = currentHp <= 0;
+        const elem = ELEMENT_ICONS[p.type] || "⭐";
+        const hpPct = Math.max(0, Math.min(100, (currentHp / maxHp) * 100));
+
+        const card = document.createElement("div");
+        card.className = `p-2.5 rounded-xl retro-border flex items-center justify-between transition ${
+            isCurrentActive ? 'bg-indigo-950/90 border-2 border-yellow-400' :
+            (isFainted ? 'bg-red-950/40 opacity-50 cursor-not-allowed' : 'bg-gray-800/90 hover:bg-gray-700 active:scale-98 cursor-pointer')
+        }`;
+
+        card.innerHTML = `
+            <div class="flex items-center space-x-2.5">
+                <img src="${getSpriteUrl(p.id)}" class="w-11 h-11 pixel-art" alt="${p.name}">
+                <div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-[9px] font-bold text-white">${p.name}</span>
+                        <span>${elem}</span>
+                        <span class="text-[8px] text-cyan-300 font-bold">Lv.${p.level}</span>
+                    </div>
+                    <div class="w-28 bg-gray-900 h-2 rounded-full overflow-hidden border border-gray-600 mt-1">
+                        <div class="${hpPct < 25 ? 'bg-red-500' : (hpPct < 50 ? 'bg-yellow-500' : 'bg-green-500')} h-full" style="width: ${hpPct}%"></div>
+                    </div>
+                    <div class="text-[7px] text-gray-300 mt-0.5">
+                        HP: ${Math.ceil(currentHp)}/${maxHp} ${isFainted ? '<span class="text-red-400 font-bold">(OMDLELÝ)</span>' : ''}
+                    </div>
+                </div>
+            </div>
+            <div>
+                ${isCurrentActive ? '<span class="bg-yellow-500 text-black px-2 py-1 rounded text-[7px] font-bold">V BOJI</span>' :
+                  (isFainted ? '<span class="bg-gray-800 text-red-400 px-2 py-1 rounded text-[7px] font-bold">NELZE</span>' :
+                   '<button class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-[8px] font-bold shadow active:scale-95">NASADIT ⚔️</button>')
+                }
+            </div>
+        `;
+
+        if (!isCurrentActive && !isFainted) {
+            card.onclick = () => performPokemonSwitch(idx);
+        }
+
+        list.appendChild(card);
+    });
+
+    document.getElementById("modal-combat-switch").classList.remove("hidden");
+}
+
+function performPokemonSwitch(newIndex) {
+    document.getElementById("modal-combat-switch").classList.add("hidden");
+
+    // Uložíme aktuální HP stávajícího Pokémona
+    if (combat.playerPokemon) {
+        player.team[combat.playerPokemonIndex].hp = combat.playerPokemon.hp;
+        player.team[combat.playerPokemonIndex].maxHp = combat.playerPokemon.maxHp;
+    }
+
+    const previousName = combat.playerPokemon.name;
+    combat.playerPokemonIndex = newIndex;
+    combat.playerPokemon = player.team[newIndex];
+
+    const pStats = calculateCurrentStats(combat.playerPokemon);
+    combat.playerPokemon.maxHp = combat.playerPokemon.maxHp || pStats.hp;
+    if (combat.playerPokemon.hp === undefined) {
+        combat.playerPokemon.hp = combat.playerPokemon.maxHp;
+    }
+    combat.playerPokemon.atk = pStats.atk;
+    combat.playerPokemon.def = pStats.def;
+
+    sfx.throwBall();
+    setCombatLog(`🔄 ${previousName}, zpět! Vpřed, ${combat.playerPokemon.name}!`);
+
+    // Výměna spotřebuje tah hráče – soupeř útočí
+    combat.turn = "animating";
+    renderCombatInterface();
+    setTimeout(doEnemyCombatAttack, 900);
+}
+
+document.getElementById("btn-close-combat-switch").onclick = () => {
+    document.getElementById("modal-combat-switch").classList.add("hidden");
+};
+
+/* ==========================================================================
+   OPTIMALIZOVANÝ VÝPOČET POŠKOZENÍ (BOSS JE TVRDÝ A NEÚPROSNÝ!)
+   ========================================================================== */
+function calculateTrueDamage(attacker, defender, move, isBossAttacking = false, isAttackingBoss = false) {
+    const atkLvl = attacker.level || 1;
+    const defLvl = defender.level || 1;
+    const atkStat = Math.max(10, attacker.atk || 20);
+    const defStat = Math.max(10, defender.def || 20);
+    const pwr = Math.max(15, move.pwr || 25);
+    const targetMaxHp = Math.max(30, defender.maxHp || 100);
+
+    const elemMult = getElementMultiplier(move.type, defender.type);
+    const isCrit = Math.random() < 0.15;
+    const critMult = isCrit ? 1.75 : 1.0;
+
+    // Pokud útočí BOSS na hráče:
+    if (isBossAttacking) {
+        const bossDmgBase = targetMaxHp * 0.38 * (pwr / 55);
+        let finalDmg = Math.round((bossDmgBase + 15) * elemMult * critMult);
+        finalDmg = Math.max(25, Math.min(Math.floor(targetMaxHp * 0.95), finalDmg));
+        return { dmg: finalDmg, isCrit, elemMult };
+    }
+
+    // Pokud hráč útočí na BOSSE:
+    if (isAttackingBoss) {
+        const pwrBonus = (pwr / 45);
+        const playerDmgToBoss = (targetMaxHp * 0.045) * pwrBonus * (atkStat / Math.max(40, defStat * 0.7));
+        const flatDmg = (atkLvl * 4) + 20;
+        let finalDmg = Math.round((playerDmgToBoss + flatDmg) * elemMult * critMult);
+        finalDmg = Math.max(15, Math.min(Math.floor(targetMaxHp * 0.18), finalDmg));
+        return { dmg: finalDmg, isCrit, elemMult };
+    }
+
+    // Běžný souboj (wild/arena)
+    const lvlRatio = Math.max(0.5, Math.min(1.8, (atkLvl + 8) / (defLvl + 8)));
+    const statRatio = Math.max(0.6, Math.min(2.0, atkStat / defStat));
+    const baseProportionalDmg = targetMaxHp * 0.22 * (pwr / 40) * statRatio * lvlRatio;
+    const flatAdd = Math.floor(4 + atkLvl * 1.5);
+    let finalDmg = Math.round((baseProportionalDmg + flatAdd) * elemMult * critMult);
+    const minDmg = Math.max(6, Math.floor(targetMaxHp * 0.08));
+    const maxDmgCap = Math.floor(targetMaxHp * 0.85);
+    finalDmg = Math.max(minDmg, Math.min(maxDmgCap, finalDmg));
+
+    return { dmg: finalDmg, isCrit, elemMult };
+}
+
+function doPlayerCombatAttack(move) {
+    if (combat.turn !== "player") return;
+    combat.turn = "animating";
+    renderCombatInterface();
+
+    sfx.skillSfx(move.type);
+    triggerSkillVFX(move.type, true);
+
+    const isAttackingBoss = (combat.mode === "boss_raid");
+    const res = calculateTrueDamage(combat.playerPokemon, combat.enemyPokemon, move, false, isAttackingBoss);
+    combat.enemyPokemon.hp = Math.max(0, combat.enemyPokemon.hp - res.dmg);
+    renderCombatInterface();
+
+    let effectMsg = "";
+    if (res.elemMult > 1.0) effectMsg = " (💥 SUPER EFEKTIVNÍ ÚTOK!)";
+    else if (res.elemMult < 1.0 && res.elemMult > 0) effectMsg = " (Není to moc efektivní...)";
+    else if (res.elemMult === 0) effectMsg = " (Nemělo to žádný účinek!)";
+
+    setCombatLog(`${combat.playerPokemon.name} použil ${move.name}! ${res.isCrit ? '💥 KRITICKÝ ZÁSAH!' : ''} Způsobil ${res.dmg} poškození.${effectMsg}`);
+
+    if (combat.enemyPokemon.hp <= 0) {
+        if (combat.mode === "boss_raid") {
+            sfx.fanfare();
+            setCombatLog(`👑 BOSS ${combat.enemyPokemon.name} PADL A JE VYČERPÁN! Rychle po něm hoď Master Ball!`);
+            combat.turn = "player";
+            renderCombatInterface();
+        } else if (combat.mode === "bot_arena") {
+            setTimeout(handleArenaVictory, 1000);
+        } else if (combat.enemyPokemon.isGoldMiner) {
+            setTimeout(handleGoldMinerVictory, 1000);
+        } else {
+            setCombatLog(`🎯 ${combat.enemyPokemon.name} byl sražen a leží vyčerpaný (0 HP)! Rychle ho chyť do Pokéballu!`);
+            combat.turn = "player";
+            renderCombatInterface();
+        }
+        return;
+    }
+
+    setTimeout(doEnemyCombatAttack, 900);
+}
+
+function doEnemyCombatAttack() {
+    combat.turn = "enemy";
+    const e = combat.enemyPokemon;
+    const move = e.moves[Math.floor(Math.random() * e.moves.length)];
+
+    sfx.skillSfx(move.type);
+    triggerSkillVFX(move.type, false);
+
+    const isBoss = (combat.mode === "boss_raid");
+    const res = calculateTrueDamage(e, combat.playerPokemon, move, isBoss, false);
+    combat.playerPokemon.hp = Math.max(0, combat.playerPokemon.hp - res.dmg);
+
+    // Synchronizace HP v týmu
+    if (combat.mode !== "boss_raid" && player.team[combat.playerPokemonIndex]) {
+        player.team[combat.playerPokemonIndex].hp = combat.playerPokemon.hp;
+    }
+
+    renderCombatInterface();
+
+    let effectMsg = "";
+    if (res.elemMult > 1.0) effectMsg = " (Super efektivní!)";
+    else if (res.elemMult < 1.0) effectMsg = " (Málo efektivní)";
+
+    setCombatLog(`Protivník ${e.name} použil ${move.name}! Způsobil ${res.dmg} poškození.${effectMsg}`);
+
+    if (combat.playerPokemon.hp <= 0) {
+        if (combat.mode === "boss_raid") {
+            combat.bossRaidIndex++;
+            if (combat.bossRaidIndex < combat.bossRaidTeam.length) {
+                combat.playerPokemon = combat.bossRaidTeam[combat.bossRaidIndex];
+                const pStats = calculateCurrentStats(combat.playerPokemon);
+                combat.playerPokemon.maxHp = pStats.hp;
+                combat.playerPokemon.hp = pStats.hp;
+                combat.playerPokemon.atk = pStats.atk;
+                combat.playerPokemon.def = pStats.def;
+                setCombatLog(`Bojovník padl! Do arény nastupuje další hrdina: ${combat.playerPokemon.name}!`);
+                combat.turn = "player";
+                renderCombatInterface();
+                return;
+            } else {
+                setCombatLog(`Celý tvůj 5členný raid tým padl!`);
+                setTimeout(() => showResultScreen(false, "Všech 5 tvých Pokémonů bylo poraženo Bossem!"), 1200);
+                return;
+            }
+        } else if (combat.mode === "bot_arena" || combat.mode === "wild") {
+            // Kontrola, zda hráč nemá v týmu ještě dalšího živého Pokémona
+            const hasAliveOther = player.team.some((p, i) => i !== combat.playerPokemonIndex && (p.hp === undefined || p.hp > 0));
+            if (hasAliveOther) {
+                setCombatLog(`💥 ${combat.playerPokemon.name} omdlel! Musíš nasadit jiného Pokémona!`);
+                openCombatSwitchModal();
+                return;
+            } else {
+                setCombatLog(`Všichni tvoji Pokémoni omdleli! Zápas skončil.`);
+                setTimeout(() => showResultScreen(false, "Všichni tvoji Pokémoni byli poraženi!"), 1200);
+                return;
+            }
+        }
+    }
+
+    combat.turn = "player";
+    renderCombatInterface();
+}
+
+/* CHYTÁNÍ BĚŽNÉHO POKÉMONA */
+function throwPokeball() {
+    const e = combat.enemyPokemon;
+    if (combat.catchesLeft <= 0) {
+        setCombatLog(`Vyčerpal jsi všechny 3 pokusy!`);
+        return;
+    }
+
+    combat.catchesLeft--;
+    combat.isThrowingBall = true;
+    renderCombatInterface();
+    sfx.throwBall();
+
+    const ball = document.getElementById("flying-pokeball");
+    const enemyImg = document.getElementById("enemy-sprite-img");
+    document.getElementById("ball-graphic").innerText = "🔴";
+    ball.classList.remove("hidden", "animate-shake");
+
+    let prog = 0;
+    const flightTimer = setInterval(() => {
+        prog += 0.05;
+        const curX = -120 * (1 - prog);
+        const curY = 180 * (1 - prog) - Math.sin(prog * Math.PI) * 110;
+        ball.style.transform = `translate(${curX}px, ${curY}px) scale(${0.7 + prog * 0.4})`;
+
+        if (prog >= 1) {
+            clearInterval(flightTimer);
+            ball.style.transform = `translate(0px, 0px) scale(1.1)`;
+            enemyImg.style.opacity = "0.2";
+            sfx.shakeBall();
+            ball.classList.add("animate-shake");
+            setCombatLog("Pokéball se chvěje...");
+
+            setTimeout(() => {
+                let catchChance = 1.0;
+                if (e.hp > 0) {
+                    catchChance = 0.45 + (0.50 * (1 - (e.hp / (e.maxHp * 0.5))));
+                }
+                const isSuccess = Math.random() < catchChance;
+
+                if (isSuccess) {
+                    ball.classList.remove("animate-shake");
+                    sfx.fanfare();
+
+                    const foodEarned = (Math.random() < 0.45) ? 1 : 0;
+                    player.food += foodEarned;
+
+                    const template = POKEMON_DATABASE.find(p => p.id === e.id);
+                    const newCompanion = {
+                        id: e.id, name: e.name, type: e.type,
+                        level: 1, exp: 0, stars: e.stars, foodFed: 0,
+                        baseHp: template.baseHp, baseAtk: template.baseAtk, moves: template.moves
+                    };
+                    player.team.push(newCompanion);
+                    player.pokedex[e.id].caught = true;
+
+                    if (combat.wildIdx !== -1) wildEntities.splice(combat.wildIdx, 1);
+                    awardDynamicExp(combat.playerPokemon, e.level);
+
+                    const foodMsg = foodEarned > 0 ? ` +${foodEarned} 🫐 Bobule!` : "";
+                    setCombatLog(`🎉 VÝBORNĚ! ${e.name} chycen a začíná na Lv1 ve tvém týmu!${foodMsg}`);
+                    saveGameToDisk();
+                    setTimeout(closeCombatScreen, 2000);
+                } else {
+                    ball.classList.remove("animate-shake");
+                    ball.classList.add("hidden");
+                    enemyImg.style.opacity = "1";
+                    sfx.tone(160, 'sawtooth', 0.2, 0.1);
+                    combat.isThrowingBall = false;
+
+                    if (combat.catchesLeft > 0) {
+                        setCombatLog(`💨 Pokémon se vytrhl! Zbývá ti ${combat.catchesLeft} pokusů.`);
+                        renderCombatInterface();
+                        if (e.hp > 0) setTimeout(doEnemyCombatAttack, 800);
+                    } else {
+                        setCombatLog(`💨 Pokémon po 3 pokusech uprchl pryč!`);
+                        if (combat.wildIdx !== -1) wildEntities.splice(combat.wildIdx, 1);
+                        setTimeout(closeCombatScreen, 1800);
+                    }
+                }
+            }, 1800);
+        }
+    }, 20);
+}
+
+/* ==========================================================================
+   SPECIÁLNÍ HOD MASTER BALLU NA BOSSE S OSLAVNOU ANIMACÍ PRO SYNA
+   ========================================================================== */
+function throwBossCatchBall() {
+    combat.isThrowingBall = true;
+    renderCombatInterface();
+    sfx.throwBall();
+
+    const ball = document.getElementById("flying-pokeball");
+    const enemyImg = document.getElementById("enemy-sprite-img");
+    document.getElementById("ball-graphic").innerText = "🟣";
+    ball.classList.remove("hidden", "animate-shake");
+
+    let prog = 0;
+    const flightTimer = setInterval(() => {
+        prog += 0.05;
+        const curX = -120 * (1 - prog);
+        const curY = 180 * (1 - prog) - Math.sin(prog * Math.PI) * 110;
+        ball.style.transform = `translate(${curX}px, ${curY}px) scale(${0.8 + prog * 0.5})`;
+
+        if (prog >= 1) {
+            clearInterval(flightTimer);
+            ball.style.transform = `translate(0px, 0px) scale(1.2)`;
+            enemyImg.style.opacity = "0.1";
+            sfx.shakeBall();
+            ball.classList.add("animate-shake");
+            setCombatLog("🟣 Master Ball se třese... Legenda se snaží vzdorovat!");
+
+            setTimeout(() => { sfx.shakeBall(); }, 700);
+            setTimeout(() => { sfx.shakeBall(); }, 1400);
+
+            setTimeout(() => {
+                ball.classList.remove("animate-shake");
+                ball.classList.add("hidden");
+                sfx.legendaryFanfare();
+
+                // Odměna a přidání bosse do týmu
+                const b = combat.enemyPokemon;
+                player.gold += 500;
+                player.food += 15;
+                player.lastBossBattleTime = Date.now();
+                player.bossDefeatedCount = (player.bossDefeatedCount || 0) + 1;
+
+                player.team.push({
+                    id: b.id, name: b.name, type: b.type,
+                    level: 1, exp: 0, stars: 4, foodFed: 0,
+                    baseHp: 190, baseAtk: 60, moves: b.moves
+                });
+                if (!player.pokedex[b.id]) player.pokedex[b.id] = { seen: true, caught: true };
+                else player.pokedex[b.id].caught = true;
+
+                saveGameToDisk();
+
+                // Zobrazení vítězné animace
+                document.getElementById("screen-combat-arena").classList.add("hidden");
+                const celebrateScreen = document.getElementById("screen-boss-capture-celebration");
+                document.getElementById("celebrate-boss-img").src = getSpriteUrl(b.id);
+                document.getElementById("celebrate-boss-name").innerText = b.name;
+                celebrateScreen.classList.remove("hidden");
+
+                document.getElementById("btn-finish-boss-celebration").onclick = () => {
+                    celebrateScreen.classList.add("hidden");
+                    closeCombatScreen();
+                };
+            }, 2300);
+        }
+    }, 20);
+}
+
+function handleArenaVictory() {
+    player.gold += 60;
+    player.food += 2;
+    awardDynamicExp(combat.playerPokemon, combat.enemyPokemon.level);
+    saveGameToDisk();
+    showResultScreen(true, "Ovládl jsi oficiální arénu! Získáváš +60 🪙 Zlata a +2 🫐 Bobule!");
+}
+
+function handleGoldMinerVictory() {
+    sfx.goldSfx();
+    const goldDrop = Math.floor(Math.random() * 25) + 35;
+    player.gold += goldDrop;
+    awardDynamicExp(combat.playerPokemon, combat.enemyPokemon.level);
+    if (combat.wildIdx !== -1) wildEntities.splice(combat.wildIdx, 1);
+    saveGameToDisk();
+    setCombatLog(`🪙 VÍTĚZSTVÍ V DOLE! Vytěžil jsi +${goldDrop} Zlaťáků!`);
+    setTimeout(closeCombatScreen, 1800);
+}
+
+function showResultScreen(isWin, msg) {
+    document.getElementById("screen-combat-arena").classList.add("hidden");
+    const res = document.getElementById("screen-result-overlay");
+    res.classList.remove("hidden");
+    document.getElementById("result-desc").innerText = msg;
+
+    if (isWin) {
+        sfx.fanfare();
+        document.getElementById("result-title").innerText = "VÍTĚZ! 🏆";
+        document.getElementById("result-title").className = "text-3xl text-yellow-400 font-extrabold tracking-wider animate-bounce";
+    } else {
+        sfx.defeat();
+        document.getElementById("result-title").innerText = "PROHRA! 💀";
+        document.getElementById("result-title").className = "text-3xl text-red-500 font-extrabold tracking-wider";
+    }
+
+    document.getElementById("btn-result-action").onclick = () => {
+        res.classList.add("hidden");
+        if (combat.mode === "bot_arena") launchBotArena();
+    };
+    document.getElementById("btn-result-exit").onclick = () => {
+        res.classList.add("hidden");
+        closeCombatScreen();
+    };
+}
+
+function awardDynamicExp(poke, enemyLvl) {
+    if (!poke || poke.level >= 100) return;
+    const pLvl = poke.level || 1;
+    const ratio = Math.max(0.4, enemyLvl / pLvl);
+    const expGain = Math.round((20 + (enemyLvl * 16)) * ratio);
+
+    poke.exp = (poke.exp || 0) + expGain;
+    showToast(`+${expGain} EXP získáno z Lv.${enemyLvl}!`);
+
+    let req = getExpRequiredForLevel(poke.level);
+    while (poke.exp >= req && poke.level < 100) {
+        poke.exp -= req;
+        poke.level++;
+        sfx.fanfare();
+        showToast(`🆙 ${poke.name} postoupil na ÚROVEŇ ${poke.level}!`);
+        req = getExpRequiredForLevel(poke.level);
+    }
+}
+
+function closeCombatScreen() {
+    document.getElementById("screen-combat-arena").classList.add("hidden");
+    document.getElementById("modal-combat-switch").classList.add("hidden");
+    combat.active = false;
+    updateTopBar();
+    // Vždy po boji plně vyléčíme všechny Pokémony v týmu
+    player.team.forEach(p => { 
+        const s = calculateCurrentStats(p);
+        p.maxHp = s.hp;
+        p.hp = s.hp;
+    });
+}
+
+document.getElementById("btn-escape-combat").addEventListener("click", closeCombatScreen);
+
+/* ==========================================================================
+   11. BOSS RAID - PROGRESE, NOVÉ LEGENDY A ČASOVAČ 24H
+   ========================================================================== */
+let selectedRaidIds = [];
+let activeRaidBoss = null;
+
+function getScaledBoss() {
+    const tier = player.bossDefeatedCount || 0;
+    const template = BOSS_DATABASE[tier % BOSS_DATABASE.length];
+
+    const hpMult = 1.0 + (tier * 0.20);
+    const atkMult = 1.0 + (tier * 0.15);
+
+    return {
+        id: template.id,
+        name: template.name,
+        type: template.type,
+        hp: Math.round(template.hp * hpMult),
+        cp: Math.round(template.cp * atkMult),
+        skill: template.skill,
+        pwr: Math.round(template.pwr * atkMult),
+        tierLevel: tier + 1,
+        weakness: template.weakness || "Ghost / Dragon"
+    };
+}
+
+function getBossCooldownInfo() {
+    const now = Date.now();
+    const last = player.lastBossBattleTime || 0;
+    const diff = now - last;
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    if (diff >= dayMs) {
+        return { canFightFree: true, text: "VOLNÝ VSTUP (1x za 24h)", canFightWithTicket: false };
+    } else {
+        const remainingMs = dayMs - diff;
+        const hrs = Math.floor(remainingMs / (1000 * 60 * 60));
+        const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+        return { 
+            canFightFree: false, 
+            text: `Zbývá ${hrs}h ${mins}m (Nebo 1🎟️ Vstupenka)`,
+            canFightWithTicket: (player.bossTickets > 0)
+        };
+    }
+}
+
+function renderBossModal() {
+    activeRaidBoss = getScaledBoss();
+    selectedRaidIds = [];
+
+    document.getElementById("current-boss-name").innerText = activeRaidBoss.name;
+    document.getElementById("current-boss-elem-badge").innerText = ELEMENT_ICONS[activeRaidBoss.type] || "🔮";
+    document.getElementById("current-boss-tier-badge").innerText = `ÚROVEŇ ${activeRaidBoss.tierLevel}`;
+    document.getElementById("current-boss-sprite").src = getSpriteUrl(activeRaidBoss.id);
+    document.getElementById("current-boss-hp-val").innerText = activeRaidBoss.hp;
+    document.getElementById("current-boss-cp-val").innerText = activeRaidBoss.cp;
+
+    const cool = getBossCooldownInfo();
+    const timerText = document.getElementById("boss-timer-text");
+    timerText.innerText = cool.text;
+    timerText.className = cool.canFightFree ? "text-emerald-400 font-bold" : (cool.canFightWithTicket ? "text-cyan-300 font-bold" : "text-amber-400 font-bold");
+
+    selectedRaidIds = player.team.slice(0, 5).map((_, i) => i);
+
+    renderRaidGrid();
+    document.getElementById("modal-boss").classList.remove("hidden");
+}
+
+function renderRaidGrid() {
+    const grid = document.getElementById("raid-pick-grid");
+    grid.innerHTML = "";
+    let totalTeamCp = 0;
+
+    player.team.forEach((p, idx) => {
+        const isSel = selectedRaidIds.includes(idx);
+        const stats = calculateCurrentStats(p);
+        if (isSel) totalTeamCp += stats.cp;
+
+        const elem = ELEMENT_ICONS[p.type] || "⭐";
+        const card = document.createElement("div");
+        card.className = `p-2 rounded-xl flex items-center space-x-2 cursor-pointer transition active:scale-95 ${isSel ? 'bg-purple-900 border-2 border-yellow-400' : 'bg-gray-800 retro-border'}`;
+        card.innerHTML = `
+            <img src="${getSpriteUrl(p.id)}" class="w-9 h-9 pixel-art" alt="${p.name}">
+            <div class="overflow-hidden">
+                <div class="text-[8px] font-bold text-white truncate">${p.name} ${elem}</div>
+                <div class="text-[7px] text-gray-400">Lv.${p.level} | ${stats.cp} CP</div>
+            </div>
+        `;
+        card.onclick = () => {
+            if (selectedRaidIds.includes(idx)) {
+                selectedRaidIds = selectedRaidIds.filter(i => i !== idx);
+            } else {
+                if (selectedRaidIds.length < 5) selectedRaidIds.push(idx);
+                else showToast("Můžeš vybrat maximálně 5 bojovníků!");
+            }
+            renderRaidGrid();
+        };
+        grid.appendChild(card);
+    });
+
+    document.getElementById("raid-selected-count").innerText = selectedRaidIds.length;
+    const ratio = totalTeamCp / activeRaidBoss.cp;
+    const chance = Math.min(95, Math.max(3, Math.floor(ratio * 50)));
+    document.getElementById("raid-chance-text").innerText = `${chance}%`;
+    document.getElementById("raid-chance-text").className = chance >= 60 ? "text-green-400 font-bold" : (chance >= 35 ? "text-yellow-400 font-bold" : "text-red-400 font-bold");
+}
+
+document.getElementById("btn-boss-info").onclick = () => {
+    document.getElementById("info-boss-name").innerText = `${activeRaidBoss.name} (Úroveň ${activeRaidBoss.tierLevel})`;
+    document.getElementById("info-boss-img").src = getSpriteUrl(activeRaidBoss.id);
+    document.getElementById("info-boss-type").innerText = `Typ: ${activeRaidBoss.type} ${ELEMENT_ICONS[activeRaidBoss.type] || ""}`;
+    document.getElementById("info-boss-skill").innerText = activeRaidBoss.skill;
+    document.getElementById("info-boss-weakness").innerText = activeRaidBoss.weakness;
+    document.getElementById("modal-boss-info-card").classList.remove("hidden");
+};
+document.getElementById("btn-close-boss-info").onclick = () => {
+    document.getElementById("modal-boss-info-card").classList.add("hidden");
+};
+
+document.getElementById("btn-start-raid").onclick = () => {
+    const cool = getBossCooldownInfo();
+
+    if (!cool.canFightFree) {
+        if (player.bossTickets > 0) {
+            player.bossTickets--;
+            updateTopBar();
+            saveGameToDisk();
+            showToast("🎟️ Použita 1 Vstupenka na Bosse!");
+        } else {
+            showToast("⏳ 24h limit nevypršel! Kup si Vstupenku v Obchodě.");
+            return;
+        }
+    }
+
+    if (selectedRaidIds.length === 0) {
+        showToast("⚠️ Vyber alespoň 1 až 5 pokémonů do nájezdu!");
+        return;
+    }
+
+    const raidTeam = selectedRaidIds.map(idx => player.team[idx]).filter(Boolean);
+    if (raidTeam.length === 0) {
+        showToast("⚠️ Vybraní pokémoni nejsou k dispozici!");
+        return;
+    }
+
+    player.team.forEach(p => { 
+        const st = calculateCurrentStats(p);
+        p.maxHp = st.hp;
+        p.hp = st.hp; 
+    });
+
+    document.getElementById("modal-boss").classList.add("hidden");
+
+    combat.active = true;
+    combat.mode = "boss_raid";
+    combat.wildIdx = -1;
+    combat.isThrowingBall = false;
+    combat.bossRaidTeam = raidTeam;
+    combat.bossRaidIndex = 0;
+
+    combat.playerPokemon = combat.bossRaidTeam[0];
+    const pStats = calculateCurrentStats(combat.playerPokemon);
+    combat.playerPokemon.maxHp = pStats.hp;
+    combat.playerPokemon.hp = pStats.hp;
+    combat.playerPokemon.atk = pStats.atk;
+    combat.playerPokemon.def = pStats.def;
+
+    combat.enemyPokemon = {
+        id: activeRaidBoss.id,
+        name: activeRaidBoss.name,
+        type: activeRaidBoss.type,
+        level: 100,
+        stars: 4,
+        maxHp: activeRaidBoss.hp,
+        hp: activeRaidBoss.hp,
+        atk: 80,
+        def: 70,
+        moves: [{ name: activeRaidBoss.skill, type: activeRaidBoss.type, pwr: activeRaidBoss.pwr }],
+        img: getSpriteUrl(activeRaidBoss.id)
+    };
+
+    if (!player.pokedex[activeRaidBoss.id]) {
+        player.pokedex[activeRaidBoss.id] = { seen: true, caught: false };
+    } else {
+        player.pokedex[activeRaidBoss.id].seen = true;
+    }
+
+    document.getElementById("screen-combat-arena").classList.remove("hidden");
+    document.getElementById("combat-mode-badge").innerText = `👑 BOSS RAID (ÚROVEŇ ${activeRaidBoss.tierLevel})`;
+    document.getElementById("flying-pokeball").classList.add("hidden");
+    document.getElementById("enemy-sprite-img").style.opacity = "1";
+
+    combat.turn = "player";
+    renderCombatInterface();
+    setCombatLog(`POZOR! Legendární BOSS ${activeRaidBoss.name} zaútočil! Tvůj ${combat.bossRaidTeam.length}členný tým vyráží do boje!`);
+};
+
+/* ==========================================================================
+   12. ARÉNA, INVENTÁŘ & POKÉDEX
+   ========================================================================== */
+function launchBotArena() {
+    if (player.team.length === 0) return;
+    player.team.forEach(p => { 
+        const s = calculateCurrentStats(p);
+        p.maxHp = s.hp;
+        p.hp = s.hp;
+    });
+
+    const maxTeamLvl = Math.max(...player.team.map(p => p.level || 1));
+    const botLvl = Math.max(1, maxTeamLvl + Math.floor(Math.random() * 5 - 2));
+
+    const template = POKEMON_DATABASE[Math.floor(Math.random() * POKEMON_DATABASE.length)];
+
+    combat.active = true;
+    combat.mode = "bot_arena";
+    combat.wildIdx = -1;
+    combat.isThrowingBall = false;
+    combat.playerPokemonIndex = 0;
+
+    combat.playerPokemon = player.team[0];
+    const pStats = calculateCurrentStats(combat.playerPokemon);
+    combat.playerPokemon.maxHp = pStats.hp;
+    combat.playerPokemon.hp = pStats.hp;
+    combat.playerPokemon.atk = pStats.atk;
+    combat.playerPokemon.def = pStats.def;
+
+    const botMock = { level: botLvl, stars: 3, baseHp: template.baseHp, baseAtk: template.baseAtk };
+    const eStats = calculateCurrentStats(botMock);
+
+    combat.enemyPokemon = {
+        id: template.id, name: template.name, type: template.type,
+        level: botLvl, stars: 3, isGoldMiner: false, maxHp: eStats.hp, hp: eStats.hp,
+        atk: eStats.atk, def: eStats.def, moves: template.moves, img: getSpriteUrl(template.id)
+    };
+
+    document.getElementById("screen-combat-arena").classList.remove("hidden");
+    document.getElementById("combat-mode-badge").innerText = "OFICIÁLNÍ ARÉNA";
+    document.getElementById("flying-pokeball").classList.add("hidden");
+    document.getElementById("ball-graphic").innerText = "🔴";
+    document.getElementById("enemy-sprite-img").style.opacity = "1";
+
+    combat.turn = "player";
+    renderCombatInterface();
+    setCombatLog(`Arénový trenér vyzývá k boji se svým ${template.name} (Lv.${botLvl})!`);
+}
+
+let teamSortType = 'cp';
+function renderTeamModal() {
+    const box = document.getElementById("team-cards-container");
+    box.innerHTML = "";
+
+    let list = player.team.map((p, idx) => ({ poke: p, originalIndex: idx }));
+    if (teamSortType === 'cp') list.sort((a,b) => calculateCurrentStats(b.poke).cp - calculateCurrentStats(a.poke).cp);
+    else if (teamSortType === 'lvl') list.sort((a,b) => b.poke.level - a.poke.level);
+    else if (teamSortType === 'stars') list.sort((a,b) => b.poke.stars - a.poke.stars);
+    else if (teamSortType === 'name') list.sort((a,b) => a.poke.name.localeCompare(b.poke.name));
+
+    list.forEach(item => {
+        const p = item.poke;
+        const origIdx = item.originalIndex;
+        const template = POKEMON_DATABASE.find(db => db.id === p.id);
+        const stats = calculateCurrentStats(p);
+        const expReq = getExpRequiredForLevel(p.level);
+        const elem = ELEMENT_ICONS[p.type] || "⭐";
+
+        const card = document.createElement("div");
+        card.className = "bg-gray-800/90 retro-border rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2";
+
+        const evoTxt = (template && template.evolvesTo) ?
+            `<span class="text-yellow-300 font-bold">Evoluce za: ${p.foodFed || 0}/${template.foodCost} 🫐</span>` :
+            `<span class="text-cyan-400 font-bold">Finální Forma ⭐</span>`;
+
+        card.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <img src="${getSpriteUrl(p.id)}" class="w-14 h-14 pixel-art bg-gray-900 rounded-lg p-1 border border-gray-700" alt="${p.name}">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold text-white">${p.name}</span>
+                        <span>${elem}</span>
+                        <span class="text-cyan-300 font-bold text-[9px]">Lv.${p.level}</span>
+                        <span class="text-yellow-400 text-xs">${getStarDisplay(p.stars)}</span>
+                    </div>
+                    <div class="text-[8px] text-gray-300 mt-1">
+                        HP: ${stats.hp} | ÚTOK: ${stats.atk} | CP: ${stats.cp} | EXP: ${p.exp || 0}/${expReq}
+                    </div>
+                    <div class="text-[8px] mt-1">${evoTxt}</div>
+                </div>
+            </div>
+            <div class="flex sm:flex-col gap-1.5 justify-end">
+                ${origIdx !== 0 ? `<button class="lead-btn bg-amber-600 hover:bg-amber-500 text-white px-2 py-1 rounded-lg text-[7px] font-bold cursor-pointer" data-idx="${origIdx}">⭐ PARŤÁK</button>` : '<span class="text-[7px] text-yellow-400 font-bold text-center">AKTIVNÍ</span>'}
+                <button class="feed-btn bg-purple-700 hover:bg-purple-600 text-white px-3 py-1.5 rounded-lg text-[8px] font-bold active:scale-95 cursor-pointer" data-idx="${origIdx}">
+                    🫐 NAKRMIT (${player.food})
+                </button>
+                <button class="recycle-btn bg-red-950 hover:bg-red-800 border border-red-700 text-red-200 px-3 py-1 rounded-lg text-[7px] font-bold active:scale-95 cursor-pointer" data-idx="${origIdx}">
+                    ♻️ ROZEBRAT (+2🫐)
+                </button>
+            </div>
+        `;
+        box.appendChild(card);
+    });
+
+    document.querySelectorAll(".lead-btn").forEach(b => {
+        b.onclick = (e) => {
+            const idx = parseInt(e.currentTarget.getAttribute("data-idx"));
+            const chosen = player.team.splice(idx, 1)[0];
+            player.team.unshift(chosen);
+            saveGameToDisk();
+            renderTeamModal();
+        };
+    });
+    document.querySelectorAll(".feed-btn").forEach(b => {
+        b.onclick = (e) => feedPokemonForEvo(parseInt(e.currentTarget.getAttribute("data-idx")));
+    });
+    document.querySelectorAll(".recycle-btn").forEach(b => {
+        b.onclick = (e) => disassemblePokemon(parseInt(e.currentTarget.getAttribute("data-idx")));
+    });
+}
+
+document.querySelectorAll(".team-sort-btn").forEach(b => {
+    b.onclick = (e) => {
+        document.querySelectorAll(".team-sort-btn").forEach(btn => btn.className = "team-sort-btn px-2 py-1 bg-gray-800 rounded cursor-pointer");
+        e.currentTarget.className = "team-sort-btn px-2 py-1 bg-amber-700 rounded cursor-pointer";
+        teamSortType = e.currentTarget.getAttribute("data-sort");
+        renderTeamModal();
+    };
+});
+
+function feedPokemonForEvo(idx) {
+    const p = player.team[idx];
+    if (!p) return;
+    if (player.food <= 0) return showToast("⚠️ Nemáš žádné jídlo 🫐! Získej ho v obchodě.");
+
+    const template = POKEMON_DATABASE.find(db => db.id === p.id);
+    if (!template || !template.evolvesTo) return showToast("✨ Tento Pokémon již dosáhl své maximální formy!");
+
+    player.food--;
+    p.foodFed = (p.foodFed || 0) + 1;
+    sfx.tone(550, 'sine', 0.1, 0.1);
+
+    if (p.foodFed >= template.foodCost) {
+        const next = POKEMON_DATABASE.find(db => db.id === template.evolvesTo);
+        if (next) {
+            sfx.fanfare();
+            p.id = next.id; p.name = next.name; p.type = next.type;
+            p.baseHp = next.baseHp; p.baseAtk = next.baseAtk; p.moves = next.moves;
+            p.foodFed = 0; p.stars = Math.min(4, (p.stars || 2) + 1);
+            player.pokedex[next.id].seen = true;
+            player.pokedex[next.id].caught = true;
+            showToast(`✨ EVOLUCE! Tvůj Pokémon se vyvinul na ${next.name}!`);
+        }
+    }
+    saveGameToDisk();
+    updateTopBar();
+    renderTeamModal();
+}
+
+function disassemblePokemon(idx) {
+    if (player.team.length <= 1) return showToast("⚠️ Nemůžeš rozebrat svého posledního pokémona!");
+    const removed = player.team.splice(idx, 1)[0];
+    player.food += 2;
+    sfx.goldSfx();
+    showToast(`♻️ ${removed.name} rozebrán! Získáno: +2 🫐 Bobule!`);
+    saveGameToDisk();
+    updateTopBar();
+    renderTeamModal();
+}
+
+function renderDexModal() {
+    const grid = document.getElementById("dex-cards-grid");
+    grid.innerHTML = "";
+    let caught = 0;
+
+    POKEMON_DATABASE.forEach(p => {
+        const info = player.pokedex[p.id] || { seen: false, caught: false };
+        if (info.caught) caught++;
+
+        const card = document.createElement("div");
+        card.className = info.caught ?
+            "bg-gray-800/90 border-2 border-green-500 rounded-xl p-2 flex flex-col items-center text-center shadow" :
+            (info.seen ? "bg-gray-900 border-2 border-yellow-700 rounded-xl p-2 flex flex-col items-center text-center opacity-70" :
+                         "bg-black/80 border-2 border-gray-800 rounded-xl p-2 flex flex-col items-center text-center opacity-40");
+
+        if (info.caught) {
+            card.innerHTML = `
+                <img src="${getSpriteUrl(p.id)}" class="w-10 h-10 pixel-art" alt="${p.name}">
+                <span class="text-[7px] font-bold text-green-300 mt-1">#${p.id} ${p.name}</span>
+                <span class="text-[6px] text-gray-300">${p.type} ${ELEMENT_ICONS[p.type] || ""}</span>
+            `;
+        } else if (info.seen) {
+            card.innerHTML = `
+                <img src="${getSpriteUrl(p.id)}" class="w-10 h-10 pixel-art filter brightness-0" alt="Seen">
+                <span class="text-[7px] font-bold text-yellow-500 mt-1">#${p.id} ???</span>
+                <span class="text-[6px] text-gray-500">Viděn</span>
+            `;
+        } else {
+            card.innerHTML = `
+                <div class="w-10 h-10 flex items-center justify-center text-sm text-gray-700">❓</div>
+                <span class="text-[7px] font-bold text-gray-600 mt-1">#${p.id} ???</span>
+                <span class="text-[6px] text-gray-700">Neobjeveno</span>
+            `;
+        }
+        grid.appendChild(card);
+    });
+
+    document.getElementById("dex-caught-count").innerText = `${caught}/${POKEMON_DATABASE.length}`;
+    document.getElementById("modal-dex").classList.remove("hidden");
+}
+
+/* ==========================================================================
+   13. MAPA & PŘESUN
+   ========================================================================== */
+function openMapModal() {
+    const list = document.getElementById("zones-list-container");
+    list.innerHTML = "";
+
+    ZONES.forEach(z => {
+        const isCurrent = player.currentZoneId === z.id;
+        const item = document.createElement("div");
+        item.className = "bg-gray-800/90 retro-border p-3 rounded-xl flex items-center justify-between";
+        item.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">${z.icon}</span>
+                <div>
+                    <div class="text-[9px] font-bold text-white">${z.name} ${isCurrent ? '<span class="text-emerald-400 font-bold ml-2">(ZDE)</span>' : ''}</div>
+                    <div class="text-[8px] text-gray-400 mt-0.5">
+                        ${z.isGoldMiner ? "Důl na zlaťáky 🪙" : `Doporučená úroveň: Lv. ${z.minLvl} -${z.maxLvl}`}
+                    </div>
+                </div>
+            </div>
+            <button class="travel-btn ${isCurrent ? 'bg-gray-700 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500'} retro-border px-3 py-2 rounded-xl text-[8px] font-bold active:scale-95 cursor-pointer" data-zone="${z.id}" ${isCurrent ? 'disabled' : ''}>
+                PŘESUNOUT SE 🚀
+            </button>
+        `;
+        list.appendChild(item);
+    });
+
+    document.querySelectorAll(".travel-btn").forEach(b => {
+        b.onclick = (e) => {
+            player.currentZoneId = parseInt(e.currentTarget.getAttribute("data-zone"));
+            player.x = WORLD_W / 2; player.y = WORLD_H / 2;
+            generateZoneTerrain();
+            updateTopBar();
+            document.getElementById("modal-map").classList.add("hidden");
+            sfx.tone(440, 'sine', 0.2, 0.1);
+            saveGameToDisk();
+            showToast("🚀 Přesunut do nové zóny!");
+        };
+    });
+
+    document.getElementById("modal-map").classList.remove("hidden");
+}
+
+/* OBCHOD */
+function initShopEvents() {
+    document.getElementById("btn-buy-ticket").onclick = () => {
+        if (player.gold < 150) return showToast("⚠️ Nemáš dostatek zlata 🪙!");
+        player.gold -= 150; player.bossTickets++;
+        sfx.goldSfx(); saveGameToDisk(); updateTopBar();
+        showToast("🎟️ Vstupenka na Bosse zakoupena!");
+    };
+    document.getElementById("btn-buy-food").onclick = () => {
+        if (player.gold < 100) return showToast("⚠️ Nemáš dostatek zlata 🪙!");
+        player.gold -= 100; player.food += 10;
+        sfx.goldSfx(); saveGameToDisk(); updateTopBar();
+        showToast("🫐 Zakoupeno 10 bobulí pro evoluci!");
+    };
+    document.getElementById("btn-buy-egg").onclick = () => {
+        if (player.gold < 300) return showToast("⚠️ Potřebuješ 300 🪙!");
+        player.gold -= 300; saveGameToDisk(); updateTopBar();
+        triggerAnimatedEggHatch();
+    };
+}
+
+function triggerAnimatedEggHatch() {
+    const overlay = document.getElementById("hatch-overlay");
+    const eggActor = document.getElementById("egg-actor");
+    const hatchedBox = document.getElementById("hatched-poke-display");
+    const finishBtn = document.getElementById("btn-finish-hatch");
+    const title = document.getElementById("hatch-title");
+
+    overlay.classList.remove("hidden");
+    eggActor.classList.remove("hidden");
+    hatchedBox.classList.add("hidden");
+    finishBtn.classList.add("hidden");
+    title.innerText = "VEJCE SE KLUBE...";
+
+    const pool = POKEMON_DATABASE.filter(p => p.baseHp >= 130);
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+
+    sfx.throwBall();
+
+    setTimeout(() => {
+        eggActor.classList.add("hidden");
+        hatchedBox.classList.remove("hidden");
+        finishBtn.classList.remove("hidden");
+        title.innerText = "POKÉMON SE VYLÍHNUL!";
+        sfx.fanfare();
+
+        document.getElementById("hatched-img").src = getSpriteUrl(chosen.id);
+        document.getElementById("hatched-name").innerText = chosen.name;
+        document.getElementById("hatched-stars").innerText = "⭐⭐⭐⭐";
+
+        finishBtn.onclick = () => {
+            player.team.push({
+                id: chosen.id, name: chosen.name, type: chosen.type,
+                level: 1, exp: 0, stars: 4, foodFed: 0,
+                baseHp: chosen.baseHp, baseAtk: chosen.baseAtk, moves: chosen.moves
+            });
+            player.pokedex[chosen.id].caught = true;
+            overlay.classList.add("hidden");
+            saveGameToDisk();
+            showToast(`🎉 ${chosen.name} (⭐⭐⭐⭐) přidán na Lv. 1 do týmu!`);
+        };
+    }, 2400);
+}
+
+/* ==========================================================================
+   14. HLAVNÍ SMYČKA & SPUŠTĚNÍ
+   ========================================================================== */
+document.getElementById("nav-btn-shop").onclick = () => document.getElementById("modal-shop").classList.remove("hidden");
+document.getElementById("btn-close-shop").onclick = () => document.getElementById("modal-shop").classList.add("hidden");
+document.getElementById("nav-btn-map").onclick = openMapModal;
+document.getElementById("btn-close-map").onclick = () => document.getElementById("modal-map").classList.add("hidden");
+document.getElementById("nav-btn-team").onclick = () => { renderTeamModal(); document.getElementById("modal-team").classList.remove("hidden"); };
+document.getElementById("btn-close-team").onclick = () => document.getElementById("modal-team").classList.add("hidden");
+document.getElementById("nav-btn-dex").onclick = renderDexModal;
+document.getElementById("btn-close-dex").onclick = () => document.getElementById("modal-dex").classList.add("hidden");
+document.getElementById("nav-btn-arena").onclick = launchBotArena;
+document.getElementById("nav-btn-boss").onclick = renderBossModal;
+document.getElementById("btn-close-boss").onclick = () => document.getElementById("modal-boss").classList.add("hidden");
+document.getElementById("btn-save-disk").onclick = saveGameToDisk;
+
+document.getElementById("mobile-menu-trigger").onclick = () => {
+    const nav = document.getElementById("sidebar-nav");
+    nav.classList.toggle("hidden");
+    nav.classList.toggle("fixed");
+    nav.classList.toggle("inset-y-0");
+    nav.classList.toggle("left-0");
+    nav.classList.toggle("z-50");
+};
+document.getElementById("touch-btn-a").onclick = checkAndTriggerEncounter;
+document.getElementById("touch-btn-map").onclick = openMapModal;
+document.getElementById("touch-btn-team").onclick = () => { renderTeamModal(); document.getElementById("modal-team").classList.remove("hidden"); };
+
+let chosenStarter = 1;
+document.querySelectorAll(".skin-btn").forEach(b => {
+    b.onclick = (e) => {
+        document.querySelectorAll(".skin-btn").forEach(btn => btn.classList.replace("border-yellow-400", "border-gray-700"));
+        const target = e.currentTarget;
+        target.classList.replace("border-gray-700", "border-yellow-400");
+        player.skin = parseInt(target.getAttribute("data-skin"));
+    };
+});
+document.querySelectorAll(".starter-card").forEach(b => {
+    b.onclick = (e) => {
+        document.querySelectorAll(".starter-card").forEach(btn => {
+            btn.classList.remove("border-green-500", "border-red-500", "border-blue-500");
+            btn.classList.add("border-transparent");
+        });
+        const target = e.currentTarget;
+        chosenStarter = parseInt(target.getAttribute("data-starter"));
+        target.classList.remove("border-transparent");
+        target.classList.add(chosenStarter === 1 ? "border-green-500" : (chosenStarter === 4 ? "border-red-500" : "border-blue-500"));
+    };
+});
+
+document.getElementById("btn-begin-game").onclick = () => {
+    sfx.init();
+    sfx.fanfare();
+    const name = document.getElementById("input-player-name").value.trim();
+    if (name.length > 0) player.name = name;
+
+    initDex();
+    const starter = POKEMON_DATABASE.find(p => p.id === chosenStarter);
+    player.team.push({
+        id: starter.id, name: starter.name, type: starter.type,
+        level: 1, exp: 0, stars: 3, foodFed: 0,
+        baseHp: starter.baseHp, baseAtk: starter.baseAtk, moves: starter.moves
+    });
+    player.pokedex[starter.id].seen = true;
+    player.pokedex[starter.id].caught = true;
+
+    launchGame();
+};
+
+document.getElementById("btn-load-continue").onclick = () => {
+    sfx.init();
+    if (loadGameFromDisk()) {
+        sfx.fanfare();
+        launchGame();
+    }
+};
+
+function launchGame() {
+    document.getElementById("screen-welcome").classList.add("hidden");
+    document.getElementById("sidebar-nav").classList.remove("hidden");
+    document.getElementById("top-currency-bar").classList.remove("hidden");
+
+    generateZoneTerrain();
+    updateTopBar();
+    initShopEvents();
+    saveGameToDisk();
+
+    setInterval(saveGameToDisk, 60000);
+    requestAnimationFrame(mainGameLoop);
+}
+
+function mainGameLoop() {
+    if (!combat.active) {
+        processPlayerMovement();
+        updateWildEntities();
+        checkWildProximity();
+        drawOverworld();
+    } else {
+        updateAndRenderVFX();
+    }
+    requestAnimationFrame(mainGameLoop);
+}
+
+window.onload = function() {
+    resizeWorldCanvas();
+    if (localStorage.getItem(STORAGE_KEY)) {
+        document.getElementById("continue-saved-container").classList.remove("hidden");
+    }
+};
+</script>
+</body>
+</html>
