@@ -348,8 +348,8 @@
                     <div class="flex items-center space-x-3">
                         <span class="text-3xl animate-bounce">🎁</span>
                         <div>
-                            <div class="text-[10px] font-bold text-yellow-300">Záhadné Vejce (Mystery Box)</div>
-                            <div class="text-[8px] text-gray-300 mt-0.5">Vylíhne se náhodný vzácný Pokémon s ⭐⭐⭐+!</div>
+                            <div class="text-[10px] font-bold text-yellow-300">Záhadné Vejce (Mystery Egg)</div>
+                            <div class="text-[8px] text-gray-300 mt-0.5">Vylíhne se náhodný vzácný Pokémon ⭐ až ⭐⭐⭐⭐!</div>
                         </div>
                     </div>
                     <button id="btn-buy-egg" class="bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 retro-border px-3 py-2 rounded-xl text-[9px] font-bold active:scale-95 text-black cursor-pointer">
@@ -860,19 +860,40 @@ const BOSS_DATABASE = [
 ];
 
 /* ==========================================================================
-   4. STATY, EXPY A ZÓNY
+   4. STATY, EXPY, REBALANCING (LVL 1 - 100) & ZÓNY
    ========================================================================== */
+// Hladká křivka expů pro postupný, motivující level-up
 function getExpRequiredForLevel(lvl) {
-    return Math.floor(1.35 * Math.pow(lvl, 2.75)) + 25;
+    if (lvl >= 100) return 999999;
+    return Math.floor(18 + Math.pow(lvl, 2.1) * 3.8);
 }
 
+// 1★ až 4★ násobiče potenciálu (potenciál růstu síly)
+const STAR_MULTIPLIERS = {
+    1: 1.00, // 1★: Běžný
+    2: 1.15, // 2★: Vzácnější (+15% statů)
+    3: 1.32, // 3★: Velmi vzácný (+32% statů)
+    4: 1.55  // 4★: Extrémně vzácný / Legenda (+55% statů)
+};
+
 function calculateCurrentStats(poke) {
-    const lvl = poke.level || 1;
-    const starMult = 1.0 + ((poke.stars || 1) - 1) * 0.10;
-    const hp = Math.floor((poke.baseHp * 1.2 + lvl * 14) * starMult);
-    const atk = Math.floor((poke.baseAtk + lvl * 2.8) * starMult);
-    const def = Math.floor((20 + lvl * 2.2) * starMult);
-    const cp = Math.floor((hp * 1.4) + (atk * 3.5) + (def * 2.0));
+    const lvl = Math.max(1, Math.min(100, poke.level || 1));
+    const starMult = STAR_MULTIPLIERS[poke.stars || 1] || 1.0;
+    const baseHp = poke.baseHp || 80;
+    const baseAtk = poke.baseAtk || 22;
+
+    // HP roste plynule, dává pocit odolnosti s každým levelem
+    const hp = Math.floor((baseHp * 1.5 + (lvl - 1) * 12 + Math.pow(lvl, 1.15) * 2.5) * starMult);
+    
+    // Útok roste tak, aby vyšší level byl zřetelně cítit
+    const atk = Math.floor((baseAtk * 1.2 + (lvl - 1) * 2.4 + Math.pow(lvl, 1.08) * 0.9) * starMult);
+    
+    // Obrana tlumí poškození
+    const def = Math.floor((18 + (lvl - 1) * 1.8 + Math.pow(lvl, 1.05) * 0.6) * starMult);
+
+    // CP pro intuitivní zobrazení souhrnné síly pro dítě
+    const cp = Math.floor((hp * 1.2) + (atk * 3.2) + (def * 1.8));
+
     return { hp, atk, def, cp };
 }
 
@@ -880,15 +901,35 @@ function getStarDisplay(stars) {
     return '⭐'.repeat(Math.max(1, Math.min(4, stars || 1)));
 }
 
+// Generátor rarity pro divokou přírodu:
+// 1★ = 70%, 2★ = 24%, 3★ = 5.5%, 4★ = 0.5% (většina 3★ a 4★ je z vajec a raidů)
+function rollWildStars() {
+    const roll = Math.random();
+    if (roll < 0.700) return 1;
+    if (roll < 0.940) return 2;
+    if (roll < 0.995) return 3;
+    return 4;
+}
+
+// Šance z vajec (v obchodě):
+// 1★ = 58%, 2★ = 28%, 3★ = 11.5%, 4★ = 2.5%
+function rollEggStars() {
+    const roll = Math.random();
+    if (roll < 0.58) return 1;
+    if (roll < 0.86) return 2;
+    if (roll < 0.975) return 3;
+    return 4;
+}
+
 const ZONES = [
-    { id: 1, name: "Smaragdové Louky", minLvl: 1, maxLvl: 10, icon: "🌿", bg: "#064e3b", pool: [1, 4, 7, 10, 13, 16, 19, 21, 23, 25, 29, 32, 43, 69] },
-    { id: 2, name: "Šeptající Hvozd", minLvl: 10, maxLvl: 20, icon: "🌲", bg: "#022c22", pool: [2, 11, 14, 17, 20, 22, 24, 27, 35, 39, 41, 52, 114, 152] },
-    { id: 3, name: "Tyrkysové Pobřeží", minLvl: 20, maxLvl: 35, icon: "🌊", bg: "#075985", pool: [8, 54, 60, 72, 79, 86, 90, 98, 116, 118, 120, 129, 158] },
-    { id: 4, name: "Sopečné Hory", minLvl: 35, maxLvl: 50, icon: "🌋", bg: "#7f1d1d", pool: [5, 28, 37, 38, 58, 74, 77, 95, 104, 111, 126, 142, 155] },
-    { id: 5, name: "Temný Dungeon", minLvl: 50, maxLvl: 70, icon: "🗝️", bg: "#312e81", pool: [42, 88, 92, 94, 96, 109, 66, 68, 81, 82, 106, 107] },
+    { id: 1, name: "Smaragdové Louky", minLvl: 1, maxLvl: 12, icon: "🌿", bg: "#064e3b", pool: [1, 4, 7, 10, 13, 16, 19, 21, 23, 25, 29, 32, 43, 69] },
+    { id: 2, name: "Šeptající Hvozd", minLvl: 12, maxLvl: 25, icon: "🌲", bg: "#022c22", pool: [2, 11, 14, 17, 20, 22, 24, 27, 35, 39, 41, 52, 114, 152] },
+    { id: 3, name: "Tyrkysové Pobřeží", minLvl: 25, maxLvl: 40, icon: "🌊", bg: "#075985", pool: [8, 54, 60, 72, 79, 86, 90, 98, 116, 118, 120, 129, 158] },
+    { id: 4, name: "Sopečné Hory", minLvl: 40, maxLvl: 55, icon: "🌋", bg: "#7f1d1d", pool: [5, 28, 37, 38, 58, 74, 77, 95, 104, 111, 126, 142, 155] },
+    { id: 5, name: "Temný Dungeon", minLvl: 55, maxLvl: 70, icon: "🗝️", bg: "#312e81", pool: [42, 88, 92, 94, 96, 109, 66, 68, 81, 82, 106, 107] },
     { id: 6, name: "Dračí Vysočina", minLvl: 70, maxLvl: 85, icon: "🐉", bg: "#4c1d95", pool: [147, 148, 133, 134, 135, 136, 181, 246, 252, 255, 258, 282] },
     { id: 7, name: "Šampiónský Vrchol", minLvl: 85, maxLvl: 100, icon: "👑", bg: "#1e1b4b", pool: [3, 6, 9, 26, 130, 143, 149, 154, 157, 160, 248, 373, 376] },
-    { id: 99, name: "Gold Pokémon Miner 🪙", minLvl: 10, maxLvl: 70, icon: "⛏️", bg: "#78350f", isGoldMiner: true, pool: [50, 51, 52, 53, 74, 81, 100, 104, 111] }
+    { id: 99, name: "Gold Pokémon Miner 🪙", minLvl: 10, maxLvl: 80, icon: "⛏️", bg: "#78350f", isGoldMiner: true, pool: [50, 51, 52, 53, 74, 81, 100, 104, 111] }
 ];
 
 /* ==========================================================================
@@ -972,7 +1013,7 @@ function updateTopBar() {
 }
 
 /* ==========================================================================
-   6. MAPA & 75 POKÉMONŮ V ZÓNĚ
+   6. MAPA & 75 POKÉMONŮ V ZÓNĚ S BALANCOVANÝM LEVEL ROZPTYLEM (±4)
    ========================================================================== */
 const TILE_SIZE = 32;
 const MAP_COLS = 100;
@@ -1016,13 +1057,27 @@ function spawnWildInCurrentZone() {
     const template = POKEMON_DATABASE.find(p => p.id === id);
     if (!template) return;
 
-    const starRoll = Math.random();
-    let stars = 1;
-    if (starRoll > 0.88) stars = 4;
-    else if (starRoll > 0.60) stars = 3;
-    else if (starRoll > 0.25) stars = 2;
+    // Rarita v divočině: přísná pravidla (většina 3★ a 4★ je z raidů a vajec)
+    const stars = rollWildStars();
 
-    const lvl = Math.floor(Math.random() * (zone.maxLvl - zone.minLvl + 1)) + zone.minLvl;
+    // Balancování levelů: Protivníci jsou v rozsahu zóny, přičemž upřednostňují
+    // rozsah kolem hráčova týmu (±4 levely), pokud je hráč v odpovídající zóně.
+    const lead = player.team[0];
+    const playerLevel = lead ? lead.level : 1;
+
+    let minBound = zone.minLvl;
+    let maxBound = zone.maxLvl;
+
+    // 65% šance na spawn v ideálním rozsahu ±4 hráčova levelu, oříznutá zónou
+    let lvl;
+    if (Math.random() < 0.65 && playerLevel >= zone.minLvl - 4 && playerLevel <= zone.maxLvl + 4) {
+        const softMin = Math.max(zone.minLvl, playerLevel - 4);
+        const softMax = Math.min(zone.maxLvl, playerLevel + 4);
+        lvl = Math.floor(Math.random() * (softMax - softMin + 1)) + softMin;
+    } else {
+        lvl = Math.floor(Math.random() * (maxBound - minBound + 1)) + minBound;
+    }
+    lvl = Math.max(1, Math.min(100, lvl));
 
     const img = new Image();
     img.src = getSpriteUrl(template.id);
@@ -1329,7 +1384,7 @@ function updateAndRenderVFX() {
 }
 
 /* ==========================================================================
-   10. BOJOVÝ ENGINE & REBALANCOVANÝ VÝPOČET POŠKOZENÍ
+   10. BOJOVÝ ENGINE & REBALANCOVANÝ VÝPOČET POŠKOZENÍ (1 - 100)
    ========================================================================== */
 let combat = {
     active: false,
@@ -1555,7 +1610,6 @@ function openCombatSwitchModal() {
 function performPokemonSwitch(newIndex) {
     document.getElementById("modal-combat-switch").classList.add("hidden");
 
-    // Uložíme aktuální HP stávajícího Pokémona
     if (combat.playerPokemon) {
         player.team[combat.playerPokemonIndex].hp = combat.playerPokemon.hp;
         player.team[combat.playerPokemonIndex].maxHp = combat.playerPokemon.maxHp;
@@ -1587,46 +1641,54 @@ document.getElementById("btn-close-combat-switch").onclick = () => {
 };
 
 /* ==========================================================================
-   OPTIMALIZOVANÝ VÝPOČET POŠKOZENÍ (BOSS JE TVRDÝ A NEÚPROSNÝ!)
+   MATEMATIKA VÝPOČTU POŠKOZENÍ (ROZSAH LVL 1 - 100)
+   - Lv 5 nesmí bez problémů porážet Lv 15
+   - Citelný růst síly, ale zachování hratelnosti
+   - Elementové bonusy mají zásadní vliv
    ========================================================================== */
 function calculateTrueDamage(attacker, defender, move, isBossAttacking = false, isAttackingBoss = false) {
-    const atkLvl = attacker.level || 1;
-    const defLvl = defender.level || 1;
+    const atkLvl = Math.max(1, Math.min(100, attacker.level || 1));
+    const defLvl = Math.max(1, Math.min(100, defender.level || 1));
     const atkStat = Math.max(10, attacker.atk || 20);
     const defStat = Math.max(10, defender.def || 20);
     const pwr = Math.max(15, move.pwr || 25);
     const targetMaxHp = Math.max(30, defender.maxHp || 100);
 
     const elemMult = getElementMultiplier(move.type, defender.type);
-    const isCrit = Math.random() < 0.15;
-    const critMult = isCrit ? 1.75 : 1.0;
+    const isCrit = Math.random() < 0.12;
+    const critMult = isCrit ? 1.6 : 1.0;
 
-    // Pokud útočí BOSS na hráče:
+    // Speciální pravidla pro BOSSE
     if (isBossAttacking) {
-        const bossDmgBase = targetMaxHp * 0.38 * (pwr / 55);
+        const bossDmgBase = targetMaxHp * 0.35 * (pwr / 55);
         let finalDmg = Math.round((bossDmgBase + 15) * elemMult * critMult);
-        finalDmg = Math.max(25, Math.min(Math.floor(targetMaxHp * 0.95), finalDmg));
+        finalDmg = Math.max(20, Math.min(Math.floor(targetMaxHp * 0.95), finalDmg));
         return { dmg: finalDmg, isCrit, elemMult };
     }
 
-    // Pokud hráč útočí na BOSSE:
     if (isAttackingBoss) {
         const pwrBonus = (pwr / 45);
-        const playerDmgToBoss = (targetMaxHp * 0.045) * pwrBonus * (atkStat / Math.max(40, defStat * 0.7));
-        const flatDmg = (atkLvl * 4) + 20;
+        const playerDmgToBoss = (targetMaxHp * 0.04) * pwrBonus * (atkStat / Math.max(40, defStat * 0.7));
+        const flatDmg = (atkLvl * 3.5) + 18;
         let finalDmg = Math.round((playerDmgToBoss + flatDmg) * elemMult * critMult);
-        finalDmg = Math.max(15, Math.min(Math.floor(targetMaxHp * 0.18), finalDmg));
+        finalDmg = Math.max(12, Math.min(Math.floor(targetMaxHp * 0.18), finalDmg));
         return { dmg: finalDmg, isCrit, elemMult };
     }
 
-    // Běžný souboj (wild/arena)
-    const lvlRatio = Math.max(0.5, Math.min(1.8, (atkLvl + 8) / (defLvl + 8)));
-    const statRatio = Math.max(0.6, Math.min(2.0, atkStat / defStat));
-    const baseProportionalDmg = targetMaxHp * 0.22 * (pwr / 40) * statRatio * lvlRatio;
-    const flatAdd = Math.floor(4 + atkLvl * 1.5);
-    let finalDmg = Math.round((baseProportionalDmg + flatAdd) * elemMult * critMult);
-    const minDmg = Math.max(6, Math.floor(targetMaxHp * 0.08));
-    const maxDmgCap = Math.floor(targetMaxHp * 0.85);
+    // Standardní souboje:
+    // Poměr úrovní zabraňuje situaci, kdy Lv 5 porazí Lv 15
+    const levelRatio = Math.pow((atkLvl + 6) / (defLvl + 6), 1.3);
+    const statFactor = (atkStat * 1.8) / Math.max(15, defStat);
+
+    // Základní poškození proporčně i absolutně
+    let rawDamage = ((pwr * 0.45 + atkLvl * 1.2) * statFactor * 0.38 + 6) * levelRatio;
+    let finalDmg = Math.round(rawDamage * elemMult * critMult);
+
+    // Omezení (capy):
+    // Pokud je útočník o mnoho slabší (např. Lv 5 vs Lv 15), dává minimální zranění
+    const minDmg = (elemMult === 0) ? 0 : Math.max(1, Math.floor(targetMaxHp * 0.02));
+    const maxDmgCap = Math.floor(targetMaxHp * 0.95);
+
     finalDmg = Math.max(minDmg, Math.min(maxDmgCap, finalDmg));
 
     return { dmg: finalDmg, isCrit, elemMult };
@@ -1685,7 +1747,6 @@ function doEnemyCombatAttack() {
     const res = calculateTrueDamage(e, combat.playerPokemon, move, isBoss, false);
     combat.playerPokemon.hp = Math.max(0, combat.playerPokemon.hp - res.dmg);
 
-    // Synchronizace HP v týmu
     if (combat.mode !== "boss_raid" && player.team[combat.playerPokemonIndex]) {
         player.team[combat.playerPokemonIndex].hp = combat.playerPokemon.hp;
     }
@@ -1718,7 +1779,6 @@ function doEnemyCombatAttack() {
                 return;
             }
         } else if (combat.mode === "bot_arena" || combat.mode === "wild") {
-            // Kontrola, zda hráč nemá v týmu ještě dalšího živého Pokémona
             const hasAliveOther = player.team.some((p, i) => i !== combat.playerPokemonIndex && (p.hp === undefined || p.hp > 0));
             if (hasAliveOther) {
                 setCombatLog(`💥 ${combat.playerPokemon.name} omdlel! Musíš nasadit jiného Pokémona!`);
@@ -1822,7 +1882,7 @@ function throwPokeball() {
 }
 
 /* ==========================================================================
-   SPECIÁLNÍ HOD MASTER BALLU NA BOSSE S OSLAVNOU ANIMACÍ PRO SYNA
+   SPECIÁLNÍ HOD MASTER BALLU NA BOSSE
    ========================================================================== */
 function throwBossCatchBall() {
     combat.isThrowingBall = true;
@@ -1857,13 +1917,13 @@ function throwBossCatchBall() {
                 ball.classList.add("hidden");
                 sfx.legendaryFanfare();
 
-                // Odměna a přidání bosse do týmu
                 const b = combat.enemyPokemon;
                 player.gold += 500;
                 player.food += 15;
                 player.lastBossBattleTime = Date.now();
                 player.bossDefeatedCount = (player.bossDefeatedCount || 0) + 1;
 
+                // Boss je vždy 4★ (hlavní zdroj nejvzácnějších 4★)
                 player.team.push({
                     id: b.id, name: b.name, type: b.type,
                     level: 1, exp: 0, stars: 4, foodFed: 0,
@@ -1874,7 +1934,6 @@ function throwBossCatchBall() {
 
                 saveGameToDisk();
 
-                // Zobrazení vítězné animace
                 document.getElementById("screen-combat-arena").classList.add("hidden");
                 const celebrateScreen = document.getElementById("screen-boss-capture-celebration");
                 document.getElementById("celebrate-boss-img").src = getSpriteUrl(b.id);
@@ -1935,11 +1994,22 @@ function showResultScreen(isWin, msg) {
     };
 }
 
+/* OPRAVENÁ A BALANCOVANÁ EXP DISTRIBUCE PROTI EXPLOITŮM */
 function awardDynamicExp(poke, enemyLvl) {
     if (!poke || poke.level >= 100) return;
-    const pLvl = poke.level || 1;
-    const ratio = Math.max(0.4, enemyLvl / pLvl);
-    const expGain = Math.round((20 + (enemyLvl * 16)) * ratio);
+    const pLvl = Math.max(1, poke.level || 1);
+
+    // Exploit ochrana: Příliš slabý soupeř nedává téměř žádné expy
+    const lvlDiff = enemyLvl - pLvl;
+    let factor = 1.0;
+    if (lvlDiff < -6) {
+        factor = Math.max(0.1, 1.0 + (lvlDiff * 0.12));
+    } else if (lvlDiff > 0) {
+        factor = Math.min(2.5, 1.0 + (lvlDiff * 0.10));
+    }
+
+    const baseExp = Math.round((14 + enemyLvl * 8) * factor);
+    const expGain = Math.max(2, baseExp);
 
     poke.exp = (poke.exp || 0) + expGain;
     showToast(`+${expGain} EXP získáno z Lv.${enemyLvl}!`);
@@ -1959,7 +2029,6 @@ function closeCombatScreen() {
     document.getElementById("modal-combat-switch").classList.add("hidden");
     combat.active = false;
     updateTopBar();
-    // Vždy po boji plně vyléčíme všechny Pokémony v týmu
     player.team.forEach(p => { 
         const s = calculateCurrentStats(p);
         p.maxHp = s.hp;
@@ -1979,8 +2048,8 @@ function getScaledBoss() {
     const tier = player.bossDefeatedCount || 0;
     const template = BOSS_DATABASE[tier % BOSS_DATABASE.length];
 
-    const hpMult = 1.0 + (tier * 0.20);
-    const atkMult = 1.0 + (tier * 0.15);
+    const hpMult = 1.0 + (tier * 0.18);
+    const atkMult = 1.0 + (tier * 0.12);
 
     return {
         id: template.id,
@@ -2178,7 +2247,8 @@ function launchBotArena() {
     });
 
     const maxTeamLvl = Math.max(...player.team.map(p => p.level || 1));
-    const botLvl = Math.max(1, maxTeamLvl + Math.floor(Math.random() * 5 - 2));
+    // V aréně trenér nabídne férovou výzvu v rozmezí hráčova levelu ±3
+    const botLvl = Math.max(1, Math.min(100, maxTeamLvl + Math.floor(Math.random() * 7 - 3)));
 
     const template = POKEMON_DATABASE[Math.floor(Math.random() * POKEMON_DATABASE.length)];
 
@@ -2195,12 +2265,12 @@ function launchBotArena() {
     combat.playerPokemon.atk = pStats.atk;
     combat.playerPokemon.def = pStats.def;
 
-    const botMock = { level: botLvl, stars: 3, baseHp: template.baseHp, baseAtk: template.baseAtk };
+    const botMock = { level: botLvl, stars: 2, baseHp: template.baseHp, baseAtk: template.baseAtk };
     const eStats = calculateCurrentStats(botMock);
 
     combat.enemyPokemon = {
         id: template.id, name: template.name, type: template.type,
-        level: botLvl, stars: 3, isGoldMiner: false, maxHp: eStats.hp, hp: eStats.hp,
+        level: botLvl, stars: 2, isGoldMiner: false, maxHp: eStats.hp, hp: eStats.hp,
         atk: eStats.atk, def: eStats.def, moves: template.moves, img: getSpriteUrl(template.id)
     };
 
@@ -2314,7 +2384,7 @@ function feedPokemonForEvo(idx) {
             sfx.fanfare();
             p.id = next.id; p.name = next.name; p.type = next.type;
             p.baseHp = next.baseHp; p.baseAtk = next.baseAtk; p.moves = next.moves;
-            p.foodFed = 0; p.stars = Math.min(4, (p.stars || 2) + 1);
+            p.foodFed = 0; p.stars = Math.min(4, (p.stars || 1) + 1);
             player.pokedex[next.id].seen = true;
             player.pokedex[next.id].caught = true;
             showToast(`✨ EVOLUCE! Tvůj Pokémon se vyvinul na ${next.name}!`);
@@ -2421,7 +2491,7 @@ function openMapModal() {
     document.getElementById("modal-map").classList.remove("hidden");
 }
 
-/* OBCHOD */
+/* OBCHOD & LÍHNUTÍ VAJEC (DISTRIBUCE RARITY) */
 function initShopEvents() {
     document.getElementById("btn-buy-ticket").onclick = () => {
         if (player.gold < 150) return showToast("⚠️ Nemáš dostatek zlata 🪙!");
@@ -2455,8 +2525,11 @@ function triggerAnimatedEggHatch() {
     finishBtn.classList.add("hidden");
     title.innerText = "VEJCE SE KLUBE...";
 
-    const pool = POKEMON_DATABASE.filter(p => p.baseHp >= 130);
-    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    // Distribuce z vajec: 1★ (58%), 2★ (28%), 3★ (11.5%), 4★ (2.5%)
+    const rolledStars = rollEggStars();
+    
+    // Z vajec se líhnou zajímaví Pokémoni z celé databáze
+    const chosen = POKEMON_DATABASE[Math.floor(Math.random() * POKEMON_DATABASE.length)];
 
     sfx.throwBall();
 
@@ -2469,18 +2542,18 @@ function triggerAnimatedEggHatch() {
 
         document.getElementById("hatched-img").src = getSpriteUrl(chosen.id);
         document.getElementById("hatched-name").innerText = chosen.name;
-        document.getElementById("hatched-stars").innerText = "⭐⭐⭐⭐";
+        document.getElementById("hatched-stars").innerText = getStarDisplay(rolledStars);
 
         finishBtn.onclick = () => {
             player.team.push({
                 id: chosen.id, name: chosen.name, type: chosen.type,
-                level: 1, exp: 0, stars: 4, foodFed: 0,
+                level: 1, exp: 0, stars: rolledStars, foodFed: 0,
                 baseHp: chosen.baseHp, baseAtk: chosen.baseAtk, moves: chosen.moves
             });
             player.pokedex[chosen.id].caught = true;
             overlay.classList.add("hidden");
             saveGameToDisk();
-            showToast(`🎉 ${chosen.name} (⭐⭐⭐⭐) přidán na Lv. 1 do týmu!`);
+            showToast(`🎉 ${chosen.name} (${getStarDisplay(rolledStars)}) přidán na Lv. 1 do týmu!`);
         };
     }, 2400);
 }
